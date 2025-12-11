@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import * as XLSX from "xlsx";
+
 
 export default function App() {
 
@@ -48,14 +50,50 @@ export default function App() {
   setRoundResult({ first: "", second: "", third: "" });
   };
 
-  // แปลงคะแนนให้เป็นระยะทาง (สูงสุด = นำ)
-const maxScore = Math.max(...Object.values(scores));
+const downloadExcel = () => {
+  const data = Object.keys(scores).map((name) => ({
+    Player: name,
+    Score: scores[name],
+  }));
 
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Scores");
 
-const getPosition = (score) => {
-if (maxScore === 0) return 0;
-return (score / maxScore) * 85; // ควบคุมความยาวของการวิ่ง
+  XLSX.writeFile(workbook, "scores.xlsx");
 };
+
+const uploadExcel = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    const data = evt.target.result;
+    const workbook = XLSX.read(data, { type: "binary" });
+
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet);
+
+    // แปลงกลับเป็น object เช่น { Meen: 10, Cho: 8, Faii: 6 }
+    const newScores = {};
+    json.forEach((row) => {
+      newScores[row.Player] = row.Score;
+    });
+
+    setScores(newScores);
+  };
+  reader.readAsBinaryString(file);
+};
+
+const clearScores = () => {
+  if (!confirm("ต้องการล้างคะแนนทั้งหมดหรือไม่ ?")) return;
+
+  const reset = { Meen: 0, Cho: 0, Faii: 0 };
+  setScores(reset);
+  localStorage.setItem("scores", JSON.stringify(reset));
+};
+
 
   return (
     <div className="min-h-screen bg-gray-950 text-white ">
@@ -78,8 +116,37 @@ return (score / maxScore) * 85; // ควบคุมความยาวขอ
             </div>
           </div>
         ))}
+        
       </div>
+        <div className="grid grid-cols-3 gap-3 mb-4 w-full max-w-xl">
 
+          {/* ปุ่มอัปโหลด */}
+          <label className="bg-blue-700/20 hover:bg-blue-700/40 p-1 rounded-lg text-blue-700 text-xs font-bold text-center cursor-pointer hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+            <i class="fi fi-rr-add "></i> อัปโหลด
+            <input
+              type="file"
+              accept=".xlsx, .xls"
+              className="hidden"
+              onChange={uploadExcel}
+            />
+          </label>
+
+          {/* ปุ่มดาวน์โหลด */}
+          <button
+            className=" bg-green-500/20 hover:bg-green-500/40 p-1 rounded-lg text-green-500 text-xs font-bold hover:scale-[1.02] transition-all duration-300 overflow-hidden"
+            onClick={downloadExcel}
+          >
+            <i class="fi fi-rr-download"></i> ดาวน์โหลด
+          </button>
+
+          <button
+            className=" bg-red-500/20 hover:bg-red-500/40 p-1 rounded-lg text-red-500 text-xs font-bold hover:scale-[1.02] transition-all duration-300 overflow-hidden"
+            onClick={clearScores}
+          >
+            <i class="fi fi-rr-trash"></i>ล้างคะแนน
+          </button>
+
+        </div>
 
       {/* เลือกผลรอบ */}
       <div className="block group  w-full max-w-xs ">
@@ -126,6 +193,6 @@ return (score / maxScore) * 85; // ควบคุมความยาวขอ
       </div>
       </div>
       </div>
-      
+
   );
 }
