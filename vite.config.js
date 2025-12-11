@@ -5,12 +5,8 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   base: "/5ave-5core/",
-  theme: {
-    extend: {
-      fontFamily: {
-        sans: ["Kanit", "sans-serif"], // ใช้แทน font-sans เดิม
-      },
-    },
-  },
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
 })
