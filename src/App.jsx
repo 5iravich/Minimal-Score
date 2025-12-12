@@ -548,8 +548,9 @@ useEffect(() => {
           .reverse()
           .map((r, i) => (
             <div key={i} className="block group p-2 overflow-hidden">
-              <div className="relative p-3 text-sm hover:shadow-lg bg-white/5 rounded-xl border border-white/10 hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500"></div>
+              <div className="relative p-3 text-sm hover:shadow-lg bg-white/5 rounded-xl border border-l-5  border-l-red-500 border-white/10 hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+                <div className="absolute top-0 right-0 w-15 h-15 bg-red-500/10 rounded-xl -mr-12 -mb-12 group-hover:scale-150 transition-transform duration-500"></div>
+                <img className="absolute opacity-20 -z-100 scale-240 group-hover:scale-280 transition-transform duration-500" src="/src/assets/pattern.svg" alt="pattern" />
               <div className="text-gray-300 text-xs mb-1">{r.time}</div>
               <div className="flex justify-center my-3">
                 <div className="mx-2 p-2 font-medium text-gray-900 rounded-md bg-yellow-300">{r.first} <span className="text-xs">ชนะ</span></div>
