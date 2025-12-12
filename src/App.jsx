@@ -16,6 +16,17 @@ export default function App() {
     third: "",
   });
 
+  const [history, setHistory] = useState(() => {
+  const saved = localStorage.getItem("history");
+  return saved ? JSON.parse(saved) : [];
+});
+
+useEffect(() => {
+  localStorage.setItem("history", JSON.stringify(history));
+}, [history]);
+
+
+
   // LOAD saved
   useEffect(() => {
     const saved = localStorage.getItem("scores");
@@ -31,58 +42,89 @@ export default function App() {
     setRoundResult((r) => ({ ...r, [field]: value }));
 
   const handleSubmit = () => {
-    if (!roundResult.first || !roundResult.second || !roundResult.third) return;
-    const newScores = { ...scores };
-    newScores[roundResult.first] += 2;
-    newScores[roundResult.second] += 1;
-    setScores(newScores);
-    setRoundResult({ first: "", second: "", third: "" });
+  if (!roundResult.first || !roundResult.second || !roundResult.third) return;
+
+  const newScores = { ...scores };
+  newScores[roundResult.first] += 2;
+  newScores[roundResult.second] += 1;
+
+  // บันทึกลง history
+  const newRound = {
+    time: new Date().toLocaleString(),
+    first: roundResult.first,
+    second: roundResult.second,
+    third: roundResult.third,
   };
+
+  setHistory((h) => [...h, newRound]);
+  setScores(newScores);
+
+  setRoundResult({ first: "", second: "", third: "" });
+};
+
 
   const downloadExcel = () => {
-    const now = new Date();
-    const pad = (n) => (n < 10 ? "0" + n : n);
-    const timestamp =
-      now.getFullYear() +
-      "-" +
-      pad(now.getMonth() + 1) +
-      "-" +
-      pad(now.getDate()) +
-      "-" +
-      pad(now.getHours()) +
-      "-" +
-      pad(now.getMinutes()) +
-      "-" +
-      pad(now.getSeconds());
+  const now = new Date();
+  const pad = (n) => (n < 10 ? "0" + n : n);
+  const timestamp =
+    now.getFullYear() +
+    "-" +
+    pad(now.getMonth() + 1) +
+    "-" +
+    pad(now.getDate()) +
+    "-" +
+    pad(now.getHours()) +
+    "-" +
+    pad(now.getMinutes()) +
+    "-" +
+    pad(now.getSeconds());
 
-    const data = Object.keys(scores).map((name) => ({
+  // Sheet 1: คะแนนรวม
+  const scoreSheet = XLSX.utils.json_to_sheet(
+    Object.keys(scores).map((name) => ({
       Player: name,
       Score: scores[name],
-    }));
+    }))
+  );
 
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Scores");
-    XLSX.writeFile(workbook, `scores-${timestamp}.xlsx`);
-  };
+  // Sheet 2: ประวัติการแข่งขัน
+  const historySheet = XLSX.utils.json_to_sheet(history);
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, scoreSheet, "Scores");
+  XLSX.utils.book_append_sheet(workbook, historySheet, "History");
+
+  XLSX.writeFile(workbook, `scores-${timestamp}.xlsx`);
+};
+
 
   const uploadExcel = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const data = evt.target.result;
-      const workbook = XLSX.read(data, { type: "binary" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(sheet);
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    const data = evt.target.result;
+    const workbook = XLSX.read(data, { type: "binary" });
+
+    // อ่าน Sheet คะแนนรวม
+    if (workbook.Sheets["Scores"]) {
+      const json = XLSX.utils.sheet_to_json(workbook.Sheets["Scores"]);
       const newScores = {};
       json.forEach((row) => {
         newScores[row.Player] = row.Score;
       });
       setScores(newScores);
-    };
-    reader.readAsBinaryString(file);
+    }
+
+    // อ่าน Sheet ประวัติ
+    if (workbook.Sheets["History"]) {
+      const json2 = XLSX.utils.sheet_to_json(workbook.Sheets["History"]);
+      setHistory(json2);
+    }
   };
+  reader.readAsBinaryString(file);
+};
+
 
   const clearScores = () => {
     if (!confirm("ต้องการล้างคะแนนทั้งหมดหรือไม่ ?")) return;
@@ -317,6 +359,17 @@ export default function App() {
     );
   };
 
+const [showHistory, setShowHistory] = useState(() => {
+  const saved = localStorage.getItem("showHistory");
+  return saved ? JSON.parse(saved) : false;
+});
+
+useEffect(() => {
+  localStorage.setItem("showHistory", JSON.stringify(showHistory));
+}, [showHistory]);
+
+
+
   return (
     <div className="min-h-screen bg-gray-950 text-white ">
       <div className="absolute bottom-4 right-4 items-center p-6">
@@ -417,14 +470,12 @@ export default function App() {
 
 
       <select className="w-full text-sm p-2 text-gray-900 bg-gray-400 rounded-xl"
-      value={roundResult.first} onChange={(e) => handleInput("first", e.target.value)}
-      >
+      value={roundResult.first} onChange={(e) => handleInput("first", e.target.value)}>
       <option value="">เลือกผู้ชนะ (2 คะแนน)</option>
       {players.map((p) => (
       <option key={p} value={p} disabled={p === roundResult.second || p === roundResult.third }> {p} </option>
       ))}
       </select>
-
 
       <select className="w-full p-2 text-sm text-gray-900 bg-gray-400 rounded-xl"
       value={roundResult.second} onChange={(e) => handleInput("second", e.target.value)}
@@ -446,13 +497,104 @@ export default function App() {
       </select>
 
 
-      <button className="w-full text-xs bg-green-600 hover:bg-green-700 p-3 rounded-xl font-bold mt-4"
+      <button className="w-full text-xs bg-green-600 hover:bg-green-700 p-3 rounded-xl font-bold"
       onClick={handleSubmit}>บันทึกคะแนน</button>
+        <div className="flex">
+          <i className="fi fi-rr-info text-sky-600 font-bold mr-2"></i>
+          <p className="text-[0.8rem] text-sky-600">คะแนนจะบันทึกไว้ภายในเครื่องของท่าน หากมีการเคลียแคชอาจทำให้คะแนนหายได้</p>
+        </div>
+      
       </div>
       
       
       </div>
+
+      {/* History list (Collapsible) */}
+{/* LEFT SIDEBAR HISTORY PANEL */}
+<motion.div
+  className="fixed top-0 left-0 h-full w-90 bg-black/30 backdrop-blur-sm p-4 z-50"
+  initial={false}
+  animate={{ width: showHistory ? 360 : 60 }}
+  transition={{ duration: 0.3 }}
+>
+
+  {/* Toggle button */}
+  <button
+    onClick={() => setShowHistory((s) => !s)}
+    className="w-full p-2 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center mb-4 transition"
+  >
+    {showHistory ? (
+      <span className="text-sm">◀</span>
+    ) : (
+      <span className="text-sm">▶</span>
+    )}
+  </button>
+
+  {/* Content inside panel */}
+  <motion.div
+    initial={false}
+    animate={{ opacity: showHistory ? 1 : 0 }}
+    transition={{ duration: 0.2 }}
+    style={{ pointerEvents: showHistory ? "auto" : "none" }}
+  >
+    <h2 className="text-lg font-semibold mb-3">ประวัติการแข่งขัน</h2>
+
+    {history.length === 0 ? (
+      <div className="text-gray-400 text-sm mt-3">ยังไม่มีประวัติ</div>
+    ) : (
+      <div className="space-y-3 overflow-y-auto max-h-[90vh] pr-2">
+        {history
+          .slice()
+          .reverse()
+          .map((r, i) => (
+            <div
+              key={i}
+              className="p-3 bg-white/5 rounded-xl border border-white/10 text-sm"
+            >
+              <div className="text-gray-300 text-xs mb-1">{r.time}</div>
+              <div className="flex justify-center my-3">
+                <div className="mx-2 p-2 font-medium text-gray-900 rounded-md bg-yellow-300">{r.first} <span className="text-xs">ชนะ</span></div>
+                <div className="mx-2 p-2 font-medium text-gray-900 rounded-md bg-gray-300">{r.second} <span className="text-xs">อันดับ 2</span></div>
+                <div className="mx-2 p-2 font-medium text-gray-900 rounded-md bg-orange-700">{r.third} <span className="text-xs">อันดับ 3</span></div>
+              </div>
+              
+
+              <div className="flex gap-2 mt-2">
+                <button
+                  className="px-2 py-1 bg-white/10 rounded text-xs"
+                  onClick={() => {
+                    if (!confirm("นำคะแนนรอบนี้มาบันทึกเพิ่ม ?")) return;
+                    const newScores = { ...scores };
+                    newScores[r.first] += 2;
+                    newScores[r.second] += 1;
+                    setScores(newScores);
+                  }}
+                >
+                  +apply
+                </button>
+
+                <button
+                  className="px-2 py-1 bg-red-500/30 rounded text-xs"
+                  onClick={() => {
+                    if (!confirm("ลบรอบนี้ ?")) return;
+                    setHistory((h) => h.filter((x, idx) => idx !== history.length - 1 - i));
+                  }}
+                >
+                  ลบ
+                </button>
+              </div>
+            </div>
+          ))}
       </div>
+    )}
+  </motion.div>
+</motion.div>
+
+        
+      </div>
+        <div className="w-full text-center text-xs text-gray-400">
+          พัฒนาโดยคุณ 5iravich — ข้อมูลเก็บในเครื่อง (localStorage) • Export/Import เป็นไฟล์ Excel (Scores + History)
+        </div>
       </div>
 
   );
