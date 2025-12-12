@@ -512,16 +512,16 @@ useEffect(() => {
       {/* History list (Collapsible) */}
 {/* LEFT SIDEBAR HISTORY PANEL */}
 <motion.div
-  className="fixed top-0 left-0 h-full w-90 bg-black/30 backdrop-blur-sm p-4 z-50"
+  className="fixed top-0 left-0 h-full w-90 backdrop-blur-sm p-4 z-50"
   initial={false}
-  animate={{ width: showHistory ? 360 : 60 }}
+  animate={{ width: showHistory ? 390 : 60 }}
   transition={{ duration: 0.3 }}
 >
 
   {/* Toggle button */}
   <button
     onClick={() => setShowHistory((s) => !s)}
-    className="w-full p-2 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center mb-4 transition"
+    className="w-full p-2 px-5 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center mb-4 transition"
   >
     {showHistory ? (
       <span className="text-sm">◀</span>
@@ -547,10 +547,9 @@ useEffect(() => {
           .slice()
           .reverse()
           .map((r, i) => (
-            <div
-              key={i}
-              className="p-3 bg-white/5 rounded-xl border border-white/10 text-sm"
-            >
+            <div key={i} className="block group p-2 overflow-hidden">
+              <div className="relative p-3 text-sm hover:shadow-lg bg-white/5 rounded-xl border border-white/10 hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500"></div>
               <div className="text-gray-300 text-xs mb-1">{r.time}</div>
               <div className="flex justify-center my-3">
                 <div className="mx-2 p-2 font-medium text-gray-900 rounded-md bg-yellow-300">{r.first} <span className="text-xs">ชนะ</span></div>
@@ -583,6 +582,8 @@ useEffect(() => {
                   ลบ
                 </button>
               </div>
+              </div>
+              
             </div>
           ))}
       </div>
