@@ -593,7 +593,7 @@ useEffect(() => {
         
       </div>
         <div className="w-full text-center text-xs text-gray-400">
-          พัฒนาโดยคุณ 5iravich — ข้อมูลเก็บในเครื่อง (localStorage) • Export/Import เป็นไฟล์ Excel (Scores + History)
+          พัฒนาโดยคุณ 5iravich และสร้างสรรค์โดย Mindy — ข้อมูลเก็บในเครื่อง (localStorage) • Export/Import เป็นไฟล์ Excel (Scores + History)
         </div>
       </div>
 
