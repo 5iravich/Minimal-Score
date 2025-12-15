@@ -97,3 +97,18 @@
     0 0;
 }
 
+@keyframes speedMove {
+  0% {
+    filter: brightness(1);
+    transform: translateY(0);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+  100% {
+    filter: brightness(1);
+    transform: translateY(-6px);
+  }
+}
+
+

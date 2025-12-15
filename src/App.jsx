@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import * as XLSX from "xlsx";
-import pattern from "./assets/pattern.svg";
+import pattern from "/src/assets/pattern.svg";
+
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, Cell } from "recharts";
+
 
 export default function App() {
   const players = ["Meen", "Cho", "Faii"]; // รายชื่อผู้แข่งขัน
@@ -134,232 +137,6 @@ useEffect(() => {
     localStorage.setItem("scores", JSON.stringify(reset));
   };
 
-  // ---------------------- CIRCUIT ANIMATION (new system) -------------------------
-  const colors = {
-    Meen: "#eb1717ff",
-    Cho: "#0ecc83ff",
-    Faii: "#008cffff",
-  };
-
-  const maxScore = Math.max(...Object.values(scores), 1);
-
-  // Visual params
-  const TRACK_SIZE = 300; // px for container (w-80 -> 320px)
-  const radius = (TRACK_SIZE - 8) / 2 - 4;
- // radius in px for circle within that svg/viewbox
-
-  // We'll keep angles & trails in refs and update with requestAnimationFrame for smoothness
-  const anglesRef = useRef({
-    Meen: Math.PI * 0, // start angle same for all -> start from same place
-    Cho: Math.PI * 0,
-    Faii: Math.PI * 0,
-  });
-
-  // Trails: store arrays of points per player (in cartesian coords centered at 0,0)
-  const trailsRef = useRef({
-    Meen: [],
-    Cho: [],
-    Faii: [],
-  });
-
-  // A state to force re-render of visual elements (throttled by RAF loop)
-  const [, setTick] = useState(0);
-  const tickRef = useRef(0);
-
-  // angles state snapshot for render (derived from refs; kept minimal)
-  const [anglesSnapshot, setAnglesSnapshot] = useState({
-    Meen: anglesRef.current.Meen,
-    Cho: anglesRef.current.Cho,
-    Faii: anglesRef.current.Faii,
-  });
-
-  useEffect(() => {
-    let rafId = null;
-    const lastTimeRef = { t: performance.now() };
-
-    const loop = (time) => {
-      const dt = (time - lastTimeRef.t) / 1000; // seconds
-      lastTimeRef.t = time;
-
-      // Update each player's angle based on score -> speed
-      players.forEach((p) => {
-        // base angular speed (radians per second)
-        // make speed proportional to score fraction but keep sane base
-        const scoreFraction = scores[p] / maxScore; // 0..1
-        const minSpeed = 0.5; // rad/s (slow)
-        const maxSpeed = 3.0; // rad/s (fast)
-        const speed = minSpeed + scoreFraction * (maxSpeed - minSpeed);
-        anglesRef.current[p] = (anglesRef.current[p] + speed * dt) % (Math.PI * 2);
-
-        // compute cartesian coords
-        const a = anglesRef.current[p];
-        const x = Math.cos(a) * radius;
-        const y = Math.sin(a) * radius;
-
-        // Append to trail — length depends on score (requirement 1)
-        // trailPoints = number of previous points to keep
-        const baseTrailPoints = 20;
-        const perScoreFactor = 0.6; // adjust how much score increases trail length
-        const desiredPoints = Math.round(baseTrailPoints + scores[p] * perScoreFactor);
-        const maxPoints = Math.max(40, desiredPoints); // minimum & scale cap
-        const tArr = trailsRef.current[p];
-        tArr.push({ x, y });
-        // keep only the last N points
-        if (tArr.length > maxPoints) tArr.splice(0, tArr.length - maxPoints);
-      });
-
-      // update snapshot and tick to re-render
-      tickRef.current++;
-      if (tickRef.current % 1 === 0) {
-        setAnglesSnapshot({
-          Meen: anglesRef.current.Meen,
-          Cho: anglesRef.current.Cho,
-          Faii: anglesRef.current.Faii,
-        });
-        setTick((t) => t + 1);
-      }
-
-      rafId = requestAnimationFrame(loop);
-    };
-
-    rafId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(rafId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scores]); // restart loop when scores object reference changes (safe)
-
-  // Helper: produce SVG path "M x y L x y ..." from trail points
-  const pathFromTrail = (pts) => {
-    if (!pts || pts.length < 2) return "";
-    // Smooth with simple quadratic bezier between segments (optional)
-    // Simpler approach: use catmull-rom -> approximate with L for now (fast)
-    return pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-  };
-
-  // Render car at current angle
-  const renderCar = (p) => {
-    const a = anglesSnapshot[p] ?? anglesRef.current[p];
-    const x = Math.cos(a) * radius;
-    const y = Math.sin(a) * radius;
-    // angle facing direction (tangent) — add 90deg to point "forward"
-    const angleDeg = (a * 180) / Math.PI + 90;
-
-    // blur amount dynamic (motion blur) proportional to score fraction
-    const blurAmount = (scores[p] / maxScore) * 6; // 0 .. 6 px
-    const scale = 1.05 + (scores[p] / maxScore) * 0.15;
-
-    return (
-      <div
-        key={p}
-        style={{
-          position: "absolute",
-          left: `calc(50% + ${x}px)`,
-          top: `calc(50% + ${y}px)`,
-          transform: `translate(-50%, -50%) rotate(${angleDeg}deg)`,
-          width: 28,
-          height: 28,
-          pointerEvents: "none",
-          zIndex: 40,
-        }}
-      >
-        <motion.div
-          animate={{
-            x: [ -3, 3, -3 ].map((v) => v * (0.6 + (scores[p] / maxScore) * 0.7)), // subtle local sway scaled by speed
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 1.2,
-            ease: "easeInOut",
-          }}
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {/* Car circle */}
-          <div
-            style={{
-              width: 15,
-              height: 15,
-              borderRadius: 999,
-              background: colors[p],
-              boxShadow: `0 0 ${Math.max(6, blurAmount * 2)}px ${colors[p]}`,
-              filter: `blur(${blurAmount}px)`,
-              transform: `scale(${scale})`,
-            }}
-          />
-        </motion.div>
-      </div>
-    );
-  };
-
-  // Render trails as SVG paths (centered at middle of track)
-  const renderTrailsSVG = () => {
-    // prepare defs for glow
-    return (
-      <svg className=""
-        width="100%"
-        height="100%"
-        viewBox={`-${TRACK_SIZE / 2} -${TRACK_SIZE / 2} ${TRACK_SIZE} ${TRACK_SIZE}`}
-        style={{ position: "absolute", inset: 0, zIndex: 20}}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="6" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <linearGradient id="g1" x1="0" x2="1">
-            <stop offset="0%" stopColor="#fff" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#fff" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        {/* draw each player's path */}
-        {players.map((p) => {
-          const pts = trailsRef.current[p];
-          if (!pts || pts.length < 2) return null;
-
-          const d = pathFromTrail(pts);
-          // stroke width can scale with score a bit
-          const strokeW = 6 + (scores[p] / maxScore) * 4;
-          const opacity = 0.28 + (scores[p] / maxScore) * 0.5;
-
-          return (
-            <g key={p} transform="">
-              <path
-                d={d}
-                stroke={colors[p]}
-                strokeWidth={strokeW}
-                strokeOpacity={opacity}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                filter="url(#glow)"
-              />
-              {/* inner sharper core */}
-              <path
-                d={d}
-                stroke="white"
-                strokeWidth={Math.max(1, strokeW * 0.25)}
-                strokeOpacity={0.6}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{ mixBlendMode: "screen" }}
-              />
-            </g>
-          );
-        })}
-      </svg>
-    );
-  };
-
 const [showHistory, setShowHistory] = useState(() => {
   const saved = localStorage.getItem("showHistory");
   return saved ? JSON.parse(saved) : false;
@@ -369,50 +146,62 @@ useEffect(() => {
   localStorage.setItem("showHistory", JSON.stringify(showHistory));
 }, [showHistory]);
 
+const chartData = players.map((p) => ({
+  name: p,
+  score: scores[p],
+  color:
+    p === "Meen"
+      ? "#ef4444"
+      : p === "Cho"
+      ? "#22c55e"
+      : "#3b82f6",
+}));
 
 
   return (
     <div className="min-h-screen bg-gray-950 text-white ">
-      <div className="absolute bottom-4 right-4 items-center p-6">
 
-        {/* Top: TRACK + SVG trails + cars */}
-        <div className="flex justify-center mb-6">
-          <div
-            className="relative rounded-full shadow-inner"
-            style={{
-              width: TRACK_SIZE-8,
-              height: TRACK_SIZE -8,
-              border: "6px solid rgba(100, 100, 100, 0.18)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background:
-                "radial-gradient(circle at center, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.86))",
-              overflow: "hidden",
-            }}
-          >
-            {/* SVG Trails (absolute) */}
-            {renderTrailsSVG()}
+      <div className="">
+        {/* SCORE GRAPH */}
+      <div className="flex-1 w-full max-w-4xl mx-auto bg-gray-900 p-4">
 
-            {/* center marker */}
-            <div
-              style={{
-                position: "absolute",
-                left: "50%",
-                top: "50%",
-                width: 6,
-                height: 6,
-                transform: "translate(-50%,-50%)",
-                borderRadius: 999,
-                background: "rgba(255,255,255,0.06)",
-                zIndex: 5,
-              }}
-            />
+        <div className="w-full h-180">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} >
+              <defs>
+                <linearGradient id="speed" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.35)" />
+                  <stop offset="50%" stopColor="rgba(255,255,255,0.05)" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,0.35)" />
+                </linearGradient>
+              </defs>
+              <Tooltip />
 
-            {/* cars rendered above SVG */}
-            {players.map((p) => renderCar(p))}
-          </div>
+              <Bar dataKey="score">
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={index}
+                    fill={entry.color}
+                    style={{
+                      animation: "speedMove 1.2s linear infinite",
+                    }}
+                  />
+                ))}
+                {/* แสดงตัวเลขบนหัวแท่ง */}
+                <LabelList
+                  dataKey="score"
+                  position="top"
+                  className="fill-white text-sm font-bold"
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
+      </div>
+      </div>
+      
+
+      <div className="absolute bottom-4 right-4 items-center p-6">
         <h3 className="text-center text-xl font-bold mb-4">ระบบเก็บคะแนนผู้แข่งขัน</h3>
 
       {/* คะแนนรวม */}
@@ -551,16 +340,16 @@ useEffect(() => {
             <div key={i} className="block group p-2 overflow-hidden">
               <div className="relative p-3 text-sm hover:shadow-lg bg-white/5 rounded-xl border border-l-5  border-l-red-500 border-white/10 hover:scale-[1.02] transition-all duration-300 overflow-hidden">
                 <div className="absolute top-0 right-0 w-15 h-15 bg-red-500/10 rounded-xl -mr-12 -mb-12 group-hover:scale-150 transition-transform duration-500"></div>
-                <img className="absolute opacity-20 -z-100 scale-240 group-hover:scale-280 transition-transform duration-500" src={pattern} alt="pattern" />
+                <img className="absolute opacity-20 -z-100 scale-300 group-hover:scale-350 transition-transform duration-500" src={pattern} alt="pattern" />
               <div className="text-gray-300 text-xs mb-1">{r.time}</div>
               <div className="flex justify-center my-3">
-                <div className="mx-2 p-2 font-medium text-gray-900 rounded-md bg-yellow-300">{r.first} <span className="text-xs">ชนะ</span></div>
-                <div className="mx-2 p-2 font-medium text-gray-900 rounded-md bg-gray-300">{r.second} <span className="text-xs">อันดับ 2</span></div>
-                <div className="mx-2 p-2 font-medium text-gray-900 rounded-md bg-orange-700">{r.third} <span className="text-xs">อันดับ 3</span></div>
+                <div className="py-2 px-3 font-medium text-gray-900 rounded-l-2xl bg-white">{r.first} <span className="text-xs">ชนะ</span></div>
+                <div className="py-2 px-3 font-medium text-gray-900 bg-white">{r.second} <span className="text-xs">อันดับ 2</span></div>
+                <div className="py-2 px-3 font-medium text-gray-900 rounded-r-2xl bg-white">{r.third} <span className="text-xs">อันดับ 3</span></div>
               </div>
               
 
-              <div className="flex gap-2 mt-2">
+              {/* <div className="flex gap-2 mt-2">
                 <button
                   className="px-2 py-1 bg-white/10 rounded text-xs"
                   onClick={() => {
@@ -583,7 +372,7 @@ useEffect(() => {
                 >
                   ลบ
                 </button>
-              </div>
+              </div> */}
               </div>
               
             </div>
