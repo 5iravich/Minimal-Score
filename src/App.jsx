@@ -63,10 +63,10 @@ useEffect(() => {
   if (!roundResult.first || !roundResult.second || !roundResult.third) return;
 
   const newScores = { ...scores };
-  const bonus = isBonusTime() ? 2 : 0;
+const bonus = isBonusTime() ? 2 : 1;
 
-  newScores[roundResult.first] += 2 * bonus;
-  newScores[roundResult.second] += 1 * bonus;
+newScores[roundResult.first] += 2 * bonus;
+newScores[roundResult.second] += 1 * bonus;
 
   // บันทึกลง history
   const newRound = {
