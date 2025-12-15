@@ -343,9 +343,9 @@ const chartData = players.map((p) => ({
                 <img className="absolute opacity-20 -z-100 scale-300 group-hover:scale-350 transition-transform duration-500" src={pattern} alt="pattern" />
               <div className="text-gray-300 text-xs mb-1">{r.time}</div>
               <div className="flex justify-center my-3">
-                <div className="py-2 px-3 font-medium text-gray-900 rounded-l-2xl bg-white">{r.first} <span className="text-xs">ชนะ</span></div>
-                <div className="py-2 px-3 font-medium text-gray-900 bg-white">{r.second} <span className="text-xs">อันดับ 2</span></div>
-                <div className="py-2 px-3 font-medium text-gray-900 rounded-r-2xl bg-white">{r.third} <span className="text-xs">อันดับ 3</span></div>
+                <div className="py-2 px-3 font-medium text-gray-900 border-1 border-red-300 rounded-l-2xl bg-white">🥇 {r.first}</div>
+                <div className="py-2 px-3 font-medium text-gray-900 border-1 border-red-300 bg-white">🥇 {r.second}</div>
+                <div className="py-2 px-3 font-medium text-gray-900 border-1 border-red-300 rounded-r-2xl bg-white">🥉 {r.third}</div>
               </div>
               
 
