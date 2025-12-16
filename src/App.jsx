@@ -8,9 +8,8 @@ import carBlue from "/src/assets/Faii.png";
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, Cell } from "recharts";
 
-
-
 export default function App() {
+  
   const players = ["Meen", "Cho", "Faii"]; // รายชื่อผู้แข่งขัน
 
   const [scores, setScores] = useState(() => {
@@ -25,15 +24,13 @@ export default function App() {
   });
 
   const [history, setHistory] = useState(() => {
-  const saved = localStorage.getItem("history");
-  return saved ? JSON.parse(saved) : [];
-});
+    const saved = localStorage.getItem("history");
+    return saved ? JSON.parse(saved) : [];
+  });
 
-useEffect(() => {
-  localStorage.setItem("history", JSON.stringify(history));
-}, [history]);
-
-
+  useEffect(() => {
+    localStorage.setItem("history", JSON.stringify(history));
+  }, [history]);
 
   // LOAD saved
   useEffect(() => {
@@ -49,104 +46,106 @@ useEffect(() => {
   const handleInput = (field, value) =>
     setRoundResult((r) => ({ ...r, [field]: value }));
 
+  //คำนวนคะแนน - โบนัส
   const isBonusTime = () => {
-  const now = new Date();
-  const minutes = now.getHours() * 60 + now.getMinutes();
+    const now = new Date();
+    const minutes = now.getHours() * 60 + now.getMinutes();
 
-  const start = 16 * 60 + 20; // 16:20
-  const end = 16 * 60 + 30;   // 16:30
+    const start = 16 * 60 + 15; // 16:20
+    const end = 16 * 60 + 35;   // 16:30
 
-  return minutes >= start && minutes <= end;
-};
-
-  const handleSubmit = () => {
-  if (!roundResult.first || !roundResult.second || !roundResult.third) return;
-
-  const newScores = { ...scores };
-const bonus = isBonusTime() ? 2 : 1;
-
-newScores[roundResult.first] += 2 * bonus;
-newScores[roundResult.second] += 1 * bonus;
-
-  // บันทึกลง history
-  const newRound = {
-  time: new Date().toLocaleString(),
-  first: roundResult.first,
-  second: roundResult.second,
-  third: roundResult.third,
-  bonus: isBonusTime(),
-};
-
-  setHistory((h) => [...h, newRound]);
-  setScores(newScores);
-
-  setRoundResult({ first: "", second: "", third: "" });
-};
-
-
-  const downloadExcel = () => {
-  const now = new Date();
-  const pad = (n) => (n < 10 ? "0" + n : n);
-  const timestamp =
-    now.getFullYear() +
-    "-" +
-    pad(now.getMonth() + 1) +
-    "-" +
-    pad(now.getDate()) +
-    "-" +
-    pad(now.getHours()) +
-    "-" +
-    pad(now.getMinutes()) +
-    "-" +
-    pad(now.getSeconds());
-
-  // Sheet 1: คะแนนรวม
-  const scoreSheet = XLSX.utils.json_to_sheet(
-    Object.keys(scores).map((name) => ({
-      Player: name,
-      Score: scores[name],
-    }))
-  );
-
-  // Sheet 2: ประวัติการแข่งขัน
-  const historySheet = XLSX.utils.json_to_sheet(history);
-
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, scoreSheet, "Scores");
-  XLSX.utils.book_append_sheet(workbook, historySheet, "History");
-
-  XLSX.writeFile(workbook, `scores-${timestamp}.xlsx`);
-};
-
-
-  const uploadExcel = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (evt) => {
-    const data = evt.target.result;
-    const workbook = XLSX.read(data, { type: "binary" });
-
-    // อ่าน Sheet คะแนนรวม
-    if (workbook.Sheets["Scores"]) {
-      const json = XLSX.utils.sheet_to_json(workbook.Sheets["Scores"]);
-      const newScores = {};
-      json.forEach((row) => {
-        newScores[row.Player] = row.Score;
-      });
-      setScores(newScores);
-    }
-
-    // อ่าน Sheet ประวัติ
-    if (workbook.Sheets["History"]) {
-      const json2 = XLSX.utils.sheet_to_json(workbook.Sheets["History"]);
-      setHistory(json2);
-    }
+    return minutes >= start && minutes <= end;
   };
-  reader.readAsBinaryString(file);
-};
+  
+  // บันทึกคะแนน
+  const handleSubmit = () => {
+    if (!roundResult.first || !roundResult.second || !roundResult.third) return;
 
+    const newScores = { ...scores };
+    const bonus = isBonusTime() ? 2 : 1;
 
+    newScores[roundResult.first] += 2 * bonus;
+    newScores[roundResult.second] += 1 * bonus;
+
+    // บันทึกลง history
+    const newRound = {
+      time: new Date().toLocaleString(),
+      first: roundResult.first,
+      second: roundResult.second,
+      third: roundResult.third,
+      bonus: isBonusTime(),
+    };
+
+      setHistory((h) => [...h, newRound]);
+      setScores(newScores);
+
+      setRoundResult({ first: "", second: "", third: "" });
+  };
+
+   // ดาวน์โหลด Excel
+  const downloadExcel = () => {
+    const now = new Date();
+    const pad = (n) => (n < 10 ? "0" + n : n);
+    const timestamp =
+      now.getFullYear() +
+      "-" +
+      pad(now.getMonth() + 1) +
+      "-" +
+      pad(now.getDate()) +
+      "-" +
+      pad(now.getHours()) +
+      "-" +
+      pad(now.getMinutes()) +
+      "-" +
+      pad(now.getSeconds());
+
+    // Sheet 1: คะแนนรวม
+    const scoreSheet = XLSX.utils.json_to_sheet(
+      Object.keys(scores).map((name) => ({
+        Player: name,
+        Score: scores[name],
+      }))
+    );
+
+    // Sheet 2: ประวัติการแข่งขัน
+    const historySheet = XLSX.utils.json_to_sheet(history);
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, scoreSheet, "Scores");
+    XLSX.utils.book_append_sheet(workbook, historySheet, "History");
+
+    XLSX.writeFile(workbook, `scores-${timestamp}.xlsx`);
+  };
+
+  // อัปโหลด Excel
+  const uploadExcel = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const data = evt.target.result;
+      const workbook = XLSX.read(data, { type: "binary" });
+
+      // อ่าน Sheet คะแนนรวม
+      if (workbook.Sheets["Scores"]) {
+        const json = XLSX.utils.sheet_to_json(workbook.Sheets["Scores"]);
+        const newScores = {};
+        json.forEach((row) => {
+          newScores[row.Player] = row.Score;
+        });
+        setScores(newScores);
+      }
+
+      // อ่าน Sheet ประวัติ
+      if (workbook.Sheets["History"]) {
+        const json2 = XLSX.utils.sheet_to_json(workbook.Sheets["History"]);
+        setHistory(json2);
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
+  //ล้างคะแนน
   const clearScores = () => {
     if (!confirm("ต้องการล้างคะแนนทั้งหมดหรือไม่ ?")) return;
     const reset = { Meen: 0, Cho: 0, Faii: 0 };
@@ -154,149 +153,149 @@ newScores[roundResult.second] += 1 * bonus;
     localStorage.setItem("scores", JSON.stringify(reset));
   };
 
-const [showHistory, setShowHistory] = useState(() => {
-  const saved = localStorage.getItem("showHistory");
-  return saved ? JSON.parse(saved) : false;
-});
+  //ประวัติการแข่งขัน
+  const [showHistory, setShowHistory] = useState(() => {
+    const saved = localStorage.getItem("showHistory");
+    return saved ? JSON.parse(saved) : false;
+  });
 
-useEffect(() => {
-  localStorage.setItem("showHistory", JSON.stringify(showHistory));
-}, [showHistory]);
+  useEffect(() => {
+    localStorage.setItem("showHistory", JSON.stringify(showHistory));
+  }, [showHistory]);
 
-const chartData = players.map((p) => ({
-  name: p,
-  score: scores[p],
-  color:
-    p === "Meen"
-      ? "#ef4444"
-      : p === "Cho"
-      ? "#22c55e"
-      : "#3b82f6",
-}));
+  const chartData = players.map((p) => ({
+    name: p,
+    score: scores[p],
+    color:
+      p === "Meen"
+        ? "#ef4444"
+        : p === "Cho"
+        ? "#22c55e"
+        : "#3b82f6",
+  }));
 
-const totalRounds = history.length;
+  const totalRounds = history.length;
 
-const winRate = (player) => {
-  if (totalRounds === 0) return 0;
-  const wins = history.filter((h) => h.first === player).length;
-  return Math.round((wins / totalRounds) * 100);
-};
+  const winRate = (player) => {
+    if (totalRounds === 0) return 0;
+    const wins = history.filter((h) => h.first === player).length;
+    return Math.round((wins / totalRounds) * 100);
+  };
 
-const bestWinRate = Math.max(...players.map((p) => winRate(p)));
+  const bestWinRate = Math.max(...players.map((p) => winRate(p)));
 
-const isTopWinner = (player) => {
-  return winRate(player) === bestWinRate && bestWinRate > 0;
-};
+  const isTopWinner = (player) => {
+    return winRate(player) === bestWinRate && bestWinRate > 0;
+  };
 
-function WinRateCircle({ percent, color, glow }) {
-  const radius = 34;
-  const stroke = 6;
-  const normalizedRadius = radius - stroke * 2;
-  const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDashoffset =
-    circumference - (percent / 100) * circumference;
+  function WinRateCircle({ percent, color, glow }) {
+    const radius = 34;
+    const stroke = 6;
+    const normalizedRadius = radius - stroke * 2;
+    const circumference = normalizedRadius * 2 * Math.PI;
+    const strokeDashoffset = circumference - (percent / 100) * circumference;
 
-  return (
-    <motion.svg
-      height={radius * 2}
-      width={radius * 2}
-      animate={
-        glow
-          ? { scale: [1, 1.08, 1] }
-          : { scale: 1 }
-      }
-      transition={
-        glow
-          ? { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
-          : {}
-      }
-    >
-      {/* Background */}
-      <circle
-        stroke="rgba(255,255,255,0.1)"
-        fill="transparent"
-        strokeWidth={stroke}
-        r={normalizedRadius}
-        cx={radius}
-        cy={radius}
-      />
-
-      {/* Glow layer */}
-      {glow && (
+    return (
+      <motion.svg
+        height={radius * 2}
+        width={radius * 2}
+        animate={
+          glow
+            ? { scale: [1, 1.08, 1] }
+            : { scale: 1 }
+        }
+        transition={
+          glow
+            ? { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
+            : {}
+        }
+      >
+        {/* Background */}
         <circle
-          stroke={color}
+          stroke="rgba(10, 10, 10, 0.45)"
           fill="transparent"
-          strokeWidth={stroke + 4}
+          strokeWidth={stroke}
           r={normalizedRadius}
           cx={radius}
           cy={radius}
-          opacity={0.35}
-          filter="blur(6px)"
         />
-      )}
 
-      {/* Progress */}
-      <motion.circle
-        stroke={color}
-        fill="transparent"
-        strokeWidth={stroke}
-        strokeLinecap="round"
-        strokeDasharray={`${circumference} ${circumference}`}
-        strokeDashoffset={strokeDashoffset}
-        r={normalizedRadius}
-        cx={radius}
-        cy={radius}
-        initial={{ strokeDashoffset: circumference }}
-        animate={{ strokeDashoffset }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      />
+        {/* Glow layer */}
+        {glow && (
+          <circle
+            stroke={color}
+            fill="transparent"
+            strokeWidth={stroke + 4}
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
+            opacity={0.35}
+            filter="blur(6px)"
+          />
+        )}
 
-      {/* Text */}
-      <text
-        x="50%"
-        y="50%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fill="white"
-        fontSize="12"
-        fontWeight="bold"
-      >
-        {percent}%
-      </text>
-    </motion.svg>
-  );
-}
+        {/* Progress */}
+        <motion.circle
+          stroke={color}
+          fill="transparent"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={`${circumference} ${circumference}`}
+          strokeDashoffset={strokeDashoffset}
+          r={normalizedRadius}
+          cx={radius}
+          cy={radius}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        />
 
-const [bonusAlert, setBonusAlert] = useState(false);
+        {/* Text */}
+        <text
+          x="50%"
+          y="50%"
+          dominantBaseline="middle"
+          textAnchor="middle"
+          fill="white"
+          fontSize="12"
+          fontWeight="bold"
+        >
+          {percent}%
+        </text>
+      </motion.svg>
+    );
+  }
 
-useEffect(() => {
-  const checkBonusTime = () => {
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
+  const [bonusAlert, setBonusAlert] = useState(false);
 
-    // เข้า 16:20 พอดี
-    if (hours === 16 && minutes === 20) {
-      const alerted = localStorage.getItem("bonusAlerted");
+  useEffect(() => {
+    const checkBonusTime = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
 
-      if (!alerted) {
-        setBonusAlert(true);
-        localStorage.setItem("bonusAlerted", "true");
+      // เข้า 16:20 พอดี
+      if (hours === 16 && minutes === 20) {
+        const alerted = localStorage.getItem("bonusAlerted");
+
+        if (!alerted) {
+          setBonusAlert(true);
+          localStorage.setItem("bonusAlerted", "true");
+        }
       }
-    }
 
-    // รีเซ็ตวันถัดไป
-    if (hours === 0 && minutes === 0) {
-      localStorage.removeItem("bonusAlerted");
-    }
-  };
+      // รีเซ็ตวันถัดไป
+      if (hours === 0 && minutes === 0) {
+        localStorage.removeItem("bonusAlerted");
+      }
+    };
 
-  const interval = setInterval(checkBonusTime, 30 * 1000);
-  return () => clearInterval(interval);
-}, []);
+    const interval = setInterval(checkBonusTime, 30 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-const CarLabel = ({ x, y, width, payload }) => {
-  if (!payload || !payload.name) return null;
+  const CarLabel = ({ x, y, width, value, payload }) => {
+  if (!payload?.name || value === 0) return null;
 
   const carMap = {
     Meen: carRed,
@@ -310,8 +309,8 @@ const CarLabel = ({ x, y, width, payload }) => {
   return (
     <image
       href={car}
-      x={x + width / 2 - 18}
-      y={y - 42}
+      x={x + width / 2 - 18}   // กึ่งกลางแท่ง
+      y={y - 40}               // ลอยเหนือแท่ง
       width={36}
       height={36}
       style={{
@@ -321,87 +320,85 @@ const CarLabel = ({ x, y, width, payload }) => {
   );
 };
 
+
   return (
     <div className="min-h-screen bg-gray-950 text-white ">
 
+      {/* ******************* แจ้งเตือนเวลาโบนัส ******************* */}
       {bonusAlert && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center"
-        >
-          <div className="bg-gradient-to-br from-yellow-400 to-orange-500 p-6 rounded-2xl shadow-2xl text-center max-w-sm">
-            <h2 className="text-2xl font-extrabold mb-2 text-black">
-              ⚡ BONUS TIME!
-            </h2>
-            <p className="text-black font-semibold mb-4">
-              เวลา 16:20 – 16:30<br />
-              คะแนนที่ได้ +2
-            </p>
-
-            <button
-              onClick={() => setBonusAlert(false)}
-              className="bg-black text-white px-4 py-2 rounded-xl font-bold hover:scale-105 transition"
-            >
-              เข้าใจแล้ว
-            </button>
+        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+          className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center">
+          <div className="block group">
+            <div className="relative rounded-xl cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-300 overflow-hidden">              
+              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 p-6 rounded-2xl shadow-2xl text-center max-w-sm">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500"></div>
+                <h2 className="text-2xl font-extrabold mb-2 text-black">⚡ เวลาโบนัสมาแว้วววววววววว!</h2>
+                <p className="text-black font-semibold mb-4">ตั้งแต่เวลา 16:15 – 16:35 น. คะแนนที่ได้จะคูณสอง</p>
+                <button onClick={() => setBonusAlert(false)} className="bg-black hover:bg-black/70 text-white px-4 py-2 rounded-xl font-bold hover:scale-105 transition">
+                  เข้าใจแล้ว
+                </button>
+              </div>
+            </div> 
           </div>
         </motion.div>
       )}
-
-      <div className="">
-        {/* SCORE GRAPH */}
-      <div className="flex-1 w-full max-w-4xl mx-auto bg-gray-900 p-4">
-
-        <div className="w-full h-180">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} barCategoryGap={30}>
-              <defs>
-                <linearGradient id="speed" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.35)" />
-                  <stop offset="50%" stopColor="rgba(255,255,255,0.05)" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,0.35)" />
-                </linearGradient>
-              </defs>
-              <Tooltip />
-
-              <Bar dataKey="score" barSize={40}>
-                {chartData.map((entry, index) => (
+      {/* ******************* *************** ******************* */}
+      
+      <div className="fixed inset-0 flex items-center justify-center">
+      
+      {/* ******************* SCORE GRAPH ******************* */}
+        <div className="flex-1 w-full max-w-4xl mx-auto bg-gray-900 p-4">
+          <div className="text-center text-xs text-gray-400">
+          </div>
+          <div className="w-full h-220">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} barCategoryGap={30} margin={{ top: 60, right: 20, left: 20, bottom: 20 }}>
+              <XAxis dataKey="name" hide />
+                <Bar dataKey="score" barSize={40}>
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={index}
+                      fill={entry.color}
+                      style={{
+                        animation: "speedMove 1.2s linear infinite",
+                      }}
+                    />
+                  ))}
+                  {/* แสดงตัวเลขบนหัวแท่ง */}
+                  {/* <LabelList
+                    dataKey="score"
+                    position="top"
+                    className="fill-white text-sm font-bold"
+                  /> */}
+                  
+                  {chartData.map((entry, index) => (
+                  
                   <Cell
                     key={index}
                     fill={entry.color}
-                    style={{
-                      animation: "speedMove 1.2s linear infinite",
-                    }}
+                    style={{ animation: "speedMove 1.2s linear infinite" }}
                   />
                 ))}
-                {/* แสดงตัวเลขบนหัวแท่ง */}
-                <LabelList
-                  dataKey="score"
-                  position="top"
-                  className="fill-white text-sm font-bold"
-                />
-              </Bar>
-              {/* <Bar dataKey="score" barSize={36} label={<CarLabel />}>
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={index}
-                  fill={entry.color}
-                  style={{ animation: "speedMove 1.2s linear infinite" }}
-                />
-              ))}
-            </Bar> */}
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-      </div>
-      
 
+                {/* หัวกราฟเป็นรูปรถ */}
+                
+                <LabelList content={<CarLabel />} />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-6 text-center text-xs text-gray-400">
+            พัฒนาโดยคุณ 5iravich และสร้างสรรค์โดย Mindy — ข้อมูลเก็บในเครื่อง (localStorage) • Export/Import เป็นไฟล์ Excel (Scores + History)
+          </div>
+        </div>
+
+        
+        {/* ******************* *************** ******************* */}
+
+      </div>
       <div className="absolute bottom-4 right-4 items-center p-6">
         <h3 className="text-center text-xl font-bold mb-4">ระบบเก็บคะแนนผู้แข่งขัน</h3>
-
-      {/* คะแนนรวม */}
+        {/* คะแนนรวม */}
       <div className="grid grid-cols-3 gap-3 mb-4 w-full max-w-xl">
         {players.map((p) => (
           <div key={p} className={`block group text-center `}>
@@ -421,19 +418,19 @@ const CarLabel = ({ x, y, width, payload }) => {
                 {scores[p]}
               </motion.p>
 
-<div className="flex justify-center">
-  <WinRateCircle
-  percent={winRate(p)}
-  color={
-    p === "Meen"
-      ? "#ef4444"
-      : p === "Cho"
-      ? "#22c55e"
-      : "#3b82f6"
-  }
-  glow={isTopWinner(p)}
-/>
-</div>
+              <div className="flex justify-center">
+                <WinRateCircle
+                percent={winRate(p)}
+                color={
+                  p === "Meen"
+                    ? "#ef4444"
+                    : p === "Cho"
+                    ? "#22c55e"
+                    : "#3b82f6"
+                }
+                glow={isTopWinner(p)}
+              />
+              </div>
 
 <p className="text-xs mt-1 opacity-70">อัตราชนะ</p>
               
@@ -475,7 +472,7 @@ const CarLabel = ({ x, y, width, payload }) => {
       {/* เลือกผลรอบ */}
       <div className="block group  w-full max-w-xs ">
         <div className="relative p-6 rounded-2xl shadow-xl space-y-4 bg-white hover:shadow-lg hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-gray-300 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500"></div>
+        <div className="absolute top-0 right-0 w-24 h-24 bg-gray-300 rounded-full -mr-12 -mt-12 -z-10 group-hover:scale-150 transition-transform duration-500"></div>
       <h2 className="text-gray-900 text-md font-bold mb-4 text-center">ผลการแข่งขันรอบนี้</h2>
 
 
@@ -506,8 +503,7 @@ const CarLabel = ({ x, y, width, payload }) => {
       ))}
       </select>
 
-
-      <button className="w-full text-xs bg-green-600 hover:bg-green-700 p-3 rounded-xl font-bold"
+      <button className="relative w-full z-10 text-xs bg-green-600 hover:bg-green-700 p-3 rounded-xl font-bold"
       onClick={handleSubmit}>บันทึกคะแนน</button>
         <div className="flex">
           <i className="fi fi-rr-info text-sky-600 font-bold mr-2"></i>
@@ -609,9 +605,7 @@ const CarLabel = ({ x, y, width, payload }) => {
 
         
       </div>
-        <div className="w-full text-center text-xs text-gray-400">
-          พัฒนาโดยคุณ 5iravich และสร้างสรรค์โดย Mindy — ข้อมูลเก็บในเครื่อง (localStorage) • Export/Import เป็นไฟล์ Excel (Scores + History)
-        </div>
+        
       </div>
 
   );
