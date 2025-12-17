@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import * as XLSX from "xlsx";
 import pattern from "/src/assets/pattern.svg";
-import carRed from "/src/assets/Mean.png";
+import carRed from "/src/assets/Meen.png";
 import carGreen from "/src/assets/Cho.png";
 import carBlue from "/src/assets/Faii.png";
 
@@ -280,8 +280,8 @@ export default function App() {
       const hours = now.getHours();
       const minutes = now.getMinutes();
 
-      // เข้า 16:20 พอดี
-      if (hours === 16 && minutes === 18) {
+      // เข้า 16:15 พอดี
+      if (hours === 16 && minutes === 15) {
         const alerted = localStorage.getItem("bonusAlerted");
 
         if (!alerted) {
@@ -300,34 +300,42 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const CarLabel = ({ x, y, width, value, payload }) => {
-  if (!payload?.name || value === 0) return null;
+const getBonusRemaining = () => {
+  const now = new Date();
+  const current =
+    now.getHours() * 60 * 60 +
+    now.getMinutes() * 60 +
+    now.getSeconds();
 
-  const carMap = {
-    Meen: carRed,
-    Cho: carGreen,
-    Faii: carBlue,
-  };
+  const end = 16 * 60 * 60 + 35 * 60; // 16:35
 
-  const car = carMap[payload.name];
-  if (!car) return null;
-
-  return (
-    <image
-      xlinkHref={car}
-      x={x + width / 2 - 18}
-      y={y - 40}
-      width={36}
-      height={36}
-      style={{
-        pointerEvents: "none",
-        filter: "drop-shadow(0 0 6px rgba(255,255,255,0.7))",
-      }}
-    />
-  );
+  return Math.max(end - current, 0);
 };
 
+const [bonusRemain, setBonusRemain] = useState(0);
 
+useEffect(() => {
+  const timer = setInterval(() => {
+    if (isBonusTime()) {
+      setBonusRemain(getBonusRemaining());
+    } else {
+      setBonusRemain(0);
+    }
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, []);
+
+const formatTime = (sec) => {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  return `${h.toString().padStart(2, "0")}:${m
+    .toString()
+    .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+};
+
+const isCritical = bonusRemain > 0 && bonusRemain < 60;
 
 const getWinStreaks = () => {
   const streaks = {};
@@ -391,36 +399,54 @@ const streakLeader = players.filter(
         <div className="flex-1 w-full max-w-4xl mx-auto bg-gray-900 p-4">
           <div className="text-center text-xs text-gray-400">
           </div>
-          <div className="w-full h-[850px]">
+          <div className="relative w-full h-[850px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} barCategoryGap={30} margin={{ top: 60, right: 20, left: 20, bottom: 20 }}>
-              <XAxis dataKey="name" hide />
-                <Bar dataKey="score" barSize={40} overflow="visible">
-                  {/* แสดงตัวเลขบนหัวแท่ง */}
-                  {/* <LabelList
-                    dataKey="score"
-                    position="top"
-                    className="fill-white text-sm font-bold"
-                  /> */}
-                  
-                  {chartData.map((entry, index) => (
-                  
-                  <Cell
-                    key={index}
-                    fill={entry.color}
-                    style={{ animation: "speedMove 1.2s linear infinite" }}
-                  />
-                ))}
+              <BarChart
+                data={chartData}
+                barCategoryGap={60}
+                margin={{ top: 80, right: 0, left: 0, bottom: 20 }}
+              >
+                <XAxis dataKey="name" hide />
+                <YAxis hide />
 
-                {/* หัวกราฟเป็นรูปรถ */}
-                
-                <LabelList content={<CarLabel />} />
+                <Bar dataKey="score" barSize={20}>
+                  {chartData.map((entry, index) => (
+                    <Cell key={index} fill={entry.color} />
+                  ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-            
+
+            {/* 🚗 Overlay รถ */}
+            {chartData.map((d, index) => {
+              const maxScore = Math.max(...chartData.map(x => x.score), 1);
+              const heightRatio = d.score / maxScore;
+
+              const leftPercent = ((index + 0.5) / chartData.length) * 100-3;
+              const bottomPercent = heightRatio * 85; // ความสูงแท่ง
+
+              const carMap = {
+                Meen: carRed,
+                Cho: carGreen,
+                Faii: carBlue,
+              };
+
+              return (
+                <motion.img
+                  key={d.name}
+                  src={carMap[d.name]}
+                  className="absolute w-[120px] h-[85px] pointer-events-none block list-none"
+                  style={{
+                    left: `${leftPercent}%`,
+                    bottom: `${bottomPercent}%`,
+                    transform: "translateX(-72%)", 
+                    rotate: 90,
+                  }}
+                />
+              );
+            })}
           </div>
-          <div className="mt-6 text-center text-xs text-gray-400">
+                    <div className="mt-6 text-center text-xs text-gray-400">
             พัฒนาโดยคุณ 5iravich และสร้างสรรค์โดย Mindy — ข้อมูลเก็บในเครื่อง (localStorage) • Export/Import เป็นไฟล์ Excel (Scores + History)
           </div>
         </div>
@@ -430,6 +456,17 @@ const streakLeader = players.filter(
 
       </div>
       <div className="absolute bottom-4 right-4 items-center p-6">
+      <div>
+        {bonusRemain > 0 && (
+          <div className="flex justify-center mb-2">
+            <div className={`px-4 py-2 rounded-full font-bold border ${isCritical ? " bg-red-500/20 border-red-400 text-red-400 animate-pluse" : "bg-yellow-500/20 border-yellow-400 text-yellow-300 animate-pluse"}
+      `} style={isCritical ? { animation: "shake 0.4s infinite" } : {}}
+    >
+              🔥 โบนัสกำลังทำงาน เหลือเวลา {formatTime(bonusRemain)}
+            </div>
+          </div>
+        )}
+      </div>
         <h3 className="text-center text-xl font-bold mb-4">ระบบเก็บคะแนนผู้แข่งขัน</h3>
         {/* คะแนนรวม */}
       <div className="grid grid-cols-3 gap-3 mb-4 w-full max-w-xl">
@@ -544,8 +581,8 @@ const streakLeader = players.filter(
       ))}
       </select>
 
-      <button className="relative w-full z-10 text-xs bg-blue-600 hover:bg-blue-700 p-3 rounded-xl font-bold"
-      onClick={handleSubmit}>บันทึกคะแนน</button>
+      <div className="relative w-full z-10 text-center text-xs bg-blue-600 hover:bg-blue-700 p-3 rounded-xl font-bold"
+      onClick={handleSubmit}>บันทึกคะแนน</div>
         <div className="flex">
           <i className="fi fi-rr-info text-sky-600 font-bold mr-2"></i>
           <p className="text-[0.8rem] text-sky-600">คะแนนจะบันทึกไว้ภายในเครื่องของท่าน หากมีการเคลียแคชอาจทำให้คะแนนหายได้</p>
