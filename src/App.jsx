@@ -51,8 +51,8 @@ export default function App() {
     const now = new Date();
     const minutes = now.getHours() * 60 + now.getMinutes();
 
-    const start = 16 * 60 + 15; // 16:20
-    const end = 16 * 60 + 35;   // 16:30
+    const start = 8 * 60 + 15; // 16:15
+    const end = 16 * 60 + 35;   // 16:35
 
     return minutes >= start && minutes <= end;
   };
@@ -62,10 +62,16 @@ export default function App() {
     if (!roundResult.first || !roundResult.second || !roundResult.third) return;
 
     const newScores = { ...scores };
+    const isBonus = isBonusTime();
     const bonus = isBonusTime() ? 2 : 1;
 
     newScores[roundResult.first] += 2 * bonus;
     newScores[roundResult.second] += 1 * bonus;
+
+    // 🥉 ที่ 3 ได้แต้มเฉพาะช่วงโบนัส
+    if (isBonus) {
+      newScores[roundResult.third] += 1;
+    }
 
     // บันทึกลง history
     const newRound = {
@@ -462,6 +468,11 @@ const streakLeader = players.filter(
               {winStreaks[p] > 1 && (
                 <p className="text-xs mt-1 text-yellow-400 font-semibold transition-all duration-300">
                   🔥 ชนะติด {winStreaks[p]} รอบ
+                </p>
+              )}
+              {winStreaks[p] <= 1 && (
+                <p className="text-xs mt-1 text-white-400 font-semibold transition-all duration-300">
+                  พยายามเข้า
                 </p>
               )}
             </div>
