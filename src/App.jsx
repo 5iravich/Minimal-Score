@@ -8,6 +8,7 @@ import carGreen from "/src/assets/Cho.png";
 import carBlue from "/src/assets/Faii.png";
 import circuit from "/src/assets/Japan_Circuit.avif"
 import loop from "/src/assets/223594.gif"
+import finish from "/src/assets/checker.jpg"
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, Cell } from "recharts";
 
@@ -406,23 +407,12 @@ const leftOffsetMap = {
       {/* ******************* SCORE GRAPH ******************* */}
         <div className="flex-1 w-full max-w-4xl mx-auto bg-gray-900/30 p-4">
           <div className="relative w-full h-[850px]">
-            {/* 🏁 FINISH LINE */}
-              <div className="absolute left-0 w-full z-20 pointer-events-none">
-                <div className="relative h-[24px]">
-                  {/* เส้น */}
-                  <div className="absolute top-1/2 left-0 w-full h-[10px] bg-gradient-to-r from-white/20 via-white to-white/20" />
-
-                  {/* ธงซ้าย */}
-                  <div className="absolute -left-2 top-1/2 -translate-y-1/2 text-4xl">
-                    🏁
-                  </div>
-
-                  {/* ธงขวา */}
-                  <div className="absolute -right-9 top-1/2 -translate-y-1/2 text-4xl">
-                    🏁
-                  </div>
-                </div>
+            {/* 🏁 FINISH LINE (Checkered) */}
+            <div className="absolute left-0 w-full z-20 pointer-events-none">
+              <div className="relative h-[28px] flex items-center">
+                <img src={finish} alt="race" className="w-full h-5" />
               </div>
+            </div>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={chartData}
@@ -432,7 +422,7 @@ const leftOffsetMap = {
                 <XAxis dataKey="name" hide />
                 <YAxis hide />
 
-                <Bar dataKey="score" barSize={20}>
+                <Bar dataKey="score" barSize={60}>
                   {chartData.map((entry, index) => (
                     <Cell key={index} fill={entry.color} />
                   ))}
@@ -458,7 +448,7 @@ const leftOffsetMap = {
                 <motion.img
                   key={d.name}
                   src={carMap[d.name]}
-                  className="absolute w-[200px] h-[130px] pointer-events-none list-none"
+                  className="absolute w-[200px] h-[130px] mb-5 pointer-events-none list-none "
                   animate={{
                     left: `${leftPercent + (leftOffsetMap[d.name] ?? 0)}%`,
                     bottom: `${bottomPercent}%`,
@@ -482,8 +472,8 @@ const leftOffsetMap = {
         {/* ******************* *************** ******************* */}
 
       </div>
-        <div className="absolute top-10 right-4">
-          <img src={logo} alt="circuit" className="w-[400px] opacity-20"/>
+        <div className="absolute top-6 right-6 hover:rotate-360 z-10 transition-all duration-300">
+          <img src={logo} alt="circuit" className="w-[60px]"/>
         </div>
         <div className="absolute top-10 right-4">
           <img src={circuit} alt="circuit" className="w-[400px]"/>
