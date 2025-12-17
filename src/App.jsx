@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import * as XLSX from "xlsx";
+import logo from "/src/menu.png"
 import pattern from "/src/assets/pattern.svg";
 import carRed from "/src/assets/Meen.png";
 import carGreen from "/src/assets/Cho.png";
@@ -479,7 +480,10 @@ const leftOffsetMap = {
         {/* ******************* *************** ******************* */}
 
       </div>
-        <div className="absolute top-6 right-4">
+        <div className="absolute top-10 right-4">
+          <img src={logo} alt="circuit" className="w-[400px] opacity-20"/>
+        </div>
+        <div className="absolute top-10 right-4">
           <img src={circuit} alt="circuit" className="w-[400px]"/>
         </div>
       <div className="absolute bottom-4 right-4 items-center p-6">
@@ -609,7 +613,7 @@ const leftOffsetMap = {
       ))}
       </select>
 
-      <div className="relative w-full z-10 text-center text-xs bg-blue-600 hover:bg-blue-700 p-3 rounded-xl font-bold"
+      <div className="relative w-full z-10 text-center text-xs bg-green-600 hover:bg-green-700 p-3 rounded-xl font-bold"
       onClick={handleSubmit}>บันทึกคะแนน</div>
         <div className="flex">
           <i className="fi fi-rr-info text-sky-600 font-bold mr-2"></i>
