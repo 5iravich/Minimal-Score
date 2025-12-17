@@ -7,6 +7,7 @@ import carRed from "/src/assets/Meen.png";
 import carGreen from "/src/assets/Cho.png";
 import carBlue from "/src/assets/Faii.png";
 import circuit from "/src/assets/Japan_Circuit.avif"
+import loop from "/src/assets/223594.gif"
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, Cell } from "recharts";
 
@@ -377,7 +378,8 @@ const leftOffsetMap = {
 };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white ">
+    <div className="min-h-screen bg-gray-950 text-white overflow-hidden">
+      <img src={loop} alt="loop" className="min-h-screen scale-150 opacity-10 " />
 
       {/* ******************* แจ้งเตือนเวลาโบนัส ******************* */}
       {bonusAlert && (
@@ -402,7 +404,7 @@ const leftOffsetMap = {
       <div className="fixed inset-0 flex items-center justify-center">
       
       {/* ******************* SCORE GRAPH ******************* */}
-        <div className="flex-1 w-full max-w-4xl mx-auto bg-gray-900 p-4">
+        <div className="flex-1 w-full max-w-4xl mx-auto bg-gray-900/30 p-4">
           <div className="relative w-full h-[850px]">
             {/* 🏁 FINISH LINE */}
               <div className="absolute left-0 w-full z-20 pointer-events-none">
