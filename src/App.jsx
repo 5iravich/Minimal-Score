@@ -51,7 +51,7 @@ export default function App() {
     const now = new Date();
     const minutes = now.getHours() * 60 + now.getMinutes();
 
-    const start = 8 * 60 + 15; // 16:15
+    const start = 16 * 60 + 15; // 16:15
     const end = 16 * 60 + 35;   // 16:35
 
     return minutes >= start && minutes <= end;
