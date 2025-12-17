@@ -410,7 +410,7 @@ const leftOffsetMap = {
             {/* 🏁 FINISH LINE (Checkered) */}
             <div className="absolute left-0 w-full z-20 pointer-events-none">
               <div className="relative h-[28px] flex items-center">
-                <img src={finish} alt="race" className="w-full h-5" />
+                <img src={finish} alt="race" className="w-full h-7" />
               </div>
             </div>
             <ResponsiveContainer width="100%" height="100%">
