@@ -546,6 +546,26 @@ function CustomSelect({ label, value, onChange, players, disabledPlayers }) {
   );
 }
 
+const getLoseStreaks = () => {
+  const streaks = {};
+  players.forEach(p => (streaks[p] = 0));
+
+  players.forEach((player) => {
+    let loseStreak = 0;
+
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i].first === player) break; // เจอชนะ = หยุด
+      loseStreak++;
+    }
+
+    streaks[player] = loseStreak;
+  });
+
+  return streaks;
+};
+
+const loseStreaks = getLoseStreaks();
+
 
   return (
     <>
@@ -743,15 +763,23 @@ function CustomSelect({ label, value, onChange, players, disabledPlayers }) {
               />
               </div>
               {winStreaks[p] > 1 && (
-                <p className="text-xs mt-1 text-yellow-400 font-semibold transition-all duration-300">
-                  🔥 ชนะติด {winStreaks[p]} รอบ
-                </p>
-              )}
-              {winStreaks[p] <= 1 && (
-                <p className="text-xs mt-1 text-white-400 font-semibold transition-all duration-300">
-                  พยายามเข้า
-                </p>
-              )}
+  <p className="text-xs mt-1 text-yellow-400 font-semibold animate-pulse">
+    🔥 ชนะติด {winStreaks[p]} รอบ
+  </p>
+)}
+
+{winStreaks[p] <= 1 && loseStreaks[p] > 1 && (
+  <p className="text-xs mt-1 text-red-400 font-semibold animate-pulse">
+    💀 แพ้ติด {loseStreaks[p]} รอบ
+  </p>
+)}
+
+{winStreaks[p] <= 1 && loseStreaks[p] <= 1 && (
+  <p className="text-xs mt-1 text-gray-400 font-semibold">
+    พร้อมลุย!
+  </p>
+)}
+
             </div>
           </div>
         ))}
@@ -1018,6 +1046,11 @@ function CustomSelect({ label, value, onChange, players, disabledPlayers }) {
 
 <div className="text-sm text-gray-400 mt-1">
   แนวโน้ม 5 รอบล่าสุด {getTrendIcon(activePlayer)}
+  {loseStreaks[activePlayer] > 1 && (
+  <div className="mt-2 text-sm text-red-400 font-bold animate-pulse">
+    💀 แพ้ติด {loseStreaks[activePlayer]} รอบ
+  </div>
+)}
 </div>
           </>
         );
