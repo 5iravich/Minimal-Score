@@ -78,9 +78,15 @@ export default function App() {
   const players = ["Meen", "Cho", "Faii"]; // รายชื่อผู้แข่งขัน
 
   const firstPlaceColorMap = {
-  Meen: "border-l-red-500",
-  Cho: "border-l-green-500",
-  Faii: "border-l-blue-500",
+  Meen: "border-l-red-500 bg-red-500/10",
+  Cho: "border-l-green-500 bg-green-500/10",
+  Faii: "border-l-blue-500 bg-blue-500/10",
+};
+
+ const OPlaceColorMap = {
+  Meen: "bg-red-500/10",
+  Cho: "bg-green-500/10",
+  Faii: "bg-blue-500/10",
 };
 
 
@@ -240,6 +246,8 @@ export default function App() {
     const saved = localStorage.getItem("showHistory");
     return saved ? JSON.parse(saved) : false;
   });
+
+  const [historyFilter, setHistoryFilter] = useState("ALL");
 
   useEffect(() => {
     localStorage.setItem("showHistory", JSON.stringify(showHistory));
@@ -883,7 +891,26 @@ const loseStreaks = getLoseStreaks();
     style={{ pointerEvents: showHistory ? "auto" : "none" }}
   >
     <h2 className="text-lg font-semibold mb-3">ประวัติการแข่งขัน <a className="ml-2 text-xs">( ทั้งหมด {totalRounds} รอบ )</a> </h2>
-    
+    <div className="flex gap-2 mb-3 text-xs">
+  {[
+    { key: "ALL", label: "ทั้งหมด" },
+    { key: "WIN", label: "🥇 ชนะ" },
+    { key: "LOSE", label: "💀 แพ้" },
+    { key: "BONUS", label: "⚡ โบนัส" },
+  ].map(t => (
+    <button
+      key={t.key}
+      onClick={() => setHistoryFilter(t.key)}
+      className={`px-2 py-1 rounded-lg font-bold transition
+        ${historyFilter === t.key
+          ? "bg-white text-black"
+          : "bg-white/10 hover:bg-white/20"}`}
+    >
+      {t.label}
+    </button>
+  ))}
+</div>
+
 
     {history.length === 0 ? (
       <div className="text-gray-400 text-sm mt-3">ยังไม่มีประวัติ</div>
@@ -895,12 +922,12 @@ const loseStreaks = getLoseStreaks();
           .map((r, i) => (
             <div key={i} className="block group p-2 overflow-hidden ">
               <div
-                className={`relative p-2 text-sm hover:shadow-lg bg-white/5 rounded-xl
+                className={`relative p-2 text-sm hover:shadow-lg rounded-xl
                 border border-l-4 border-white/10
                 ${firstPlaceColorMap[r.first] ?? "border-l-gray-500"}
                 hover:scale-[1.02] transition-all duration-300 overflow-hidden`}
               >
-                <div className="absolute top-0 right-0 w-15 h-15 bg-red-500/10 rounded-xl -mr-12 -mb-12 group-hover:scale-150 transition-transform duration-500"></div>
+                <div className={`absolute top-0 right-0 w-15 h-15 ${OPlaceColorMap[r.first] ?? "bg-gray-500/10" } rounded-xl -mr-12 -mb-12 group-hover:scale-150 transition-transform duration-500`}></div>
                 <img className="absolute opacity-20 -z-100 scale-300 group-hover:scale-350 transition-transform duration-500" src={pattern} alt="pattern" />
               <div className="text-gray-300 text-xs mb-2">{r.time}</div>
               <div className="flex justify-center">
@@ -913,32 +940,6 @@ const loseStreaks = getLoseStreaks();
                   ⚡ PEAK TIME ZONE // BONUS TIME x 2
                 </div>
               )}
-              
-
-              {/* <div className="flex gap-2 mt-2">
-                <button
-                  className="px-2 py-1 bg-white/10 rounded text-xs"
-                  onClick={() => {
-                    if (!confirm("นำคะแนนรอบนี้มาบันทึกเพิ่ม ?")) return;
-                    const newScores = { ...scores };
-                    newScores[r.first] += 2;
-                    newScores[r.second] += 1;
-                    setScores(newScores);
-                  }}
-                >
-                  +apply
-                </button>
-
-                <button
-                  className="px-2 py-1 bg-red-500/30 rounded text-xs"
-                  onClick={() => {
-                    if (!confirm("ลบรอบนี้ ?")) return;
-                    setHistory((h) => h.filter((x, idx) => idx !== history.length - 1 - i));
-                  }}
-                >
-                  ลบ
-                </button>
-              </div> */}
               </div>
               
             </div>
