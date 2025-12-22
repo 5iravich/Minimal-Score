@@ -146,35 +146,80 @@ export default function App() {
   };
   
   // บันทึกคะแนน
+  // const handleSubmit = () => {
+  //   if (!roundResult.first || !roundResult.second || !roundResult.third) return;
+
+  //   const newScores = { ...scores };
+  //   const isBonus = isBonusTime();
+  //   const bonus = isBonusTime() ? 2 : 1;
+
+  //   newScores[roundResult.first] += 2 * bonus;
+  //   newScores[roundResult.second] += 1 * bonus;
+
+  //   // 🥉 ที่ 3 ได้แต้มเฉพาะช่วงโบนัส
+  //   if (isBonus) {
+  //     newScores[roundResult.third] += 1;
+  //   }
+
+  //   // บันทึกลง history
+  //   const newRound = {
+  //     time: new Date().toLocaleString(),
+  //     first: roundResult.first,
+  //     second: roundResult.second,
+  //     third: roundResult.third,
+  //     bonus: isBonusTime(),
+  //   };
+
+  //     setHistory((h) => [...h, newRound]);
+  //     setScores(newScores);
+
+  //     setRoundResult({ first: "", second: "", third: "" });
+  // };
+  const [explosion, setExplosion] = useState(null);
+
   const handleSubmit = () => {
-    if (!roundResult.first || !roundResult.second || !roundResult.third) return;
+  if (!roundResult.first || !roundResult.second || !roundResult.third) return;
 
-    const newScores = { ...scores };
-    const isBonus = isBonusTime();
-    const bonus = isBonusTime() ? 2 : 1;
+  const prevHistory = [...history];
+  const prevWinner =
+    prevHistory.length > 0 ? prevHistory[prevHistory.length - 1].first : null;
 
-    newScores[roundResult.first] += 2 * bonus;
-    newScores[roundResult.second] += 1 * bonus;
+  const prevStreak =
+    prevWinner ? getCurrentWinStreak(prevWinner) : 0;
 
-    // 🥉 ที่ 3 ได้แต้มเฉพาะช่วงโบนัส
-    if (isBonus) {
-      newScores[roundResult.third] += 1;
-    }
+  // 👉 ถ้ามีคนชนะติด ≥ 3 และรอบนี้แพ้
+  if (
+    prevWinner &&
+    prevStreak >= 3 &&
+    roundResult.first !== prevWinner
+  ) {
+    setExplosion({
+      loser: prevWinner,
+      winner: roundResult.first,
+    });
+  }
 
-    // บันทึกลง history
-    const newRound = {
-      time: new Date().toLocaleString(),
-      first: roundResult.first,
-      second: roundResult.second,
-      third: roundResult.third,
-      bonus: isBonusTime(),
-    };
+  const newScores = { ...scores };
+  const isBonus = isBonusTime();
+  const bonus = isBonus ? 2 : 1;
 
-      setHistory((h) => [...h, newRound]);
-      setScores(newScores);
+  newScores[roundResult.first] += 2 * bonus;
+  newScores[roundResult.second] += 1 * bonus;
+  if (isBonus) newScores[roundResult.third] += 1;
 
-      setRoundResult({ first: "", second: "", third: "" });
+  const newRound = {
+    time: new Date().toLocaleString(),
+    first: roundResult.first,
+    second: roundResult.second,
+    third: roundResult.third,
+    bonus: isBonus,
   };
+
+  setHistory((h) => [...h, newRound]);
+  setScores(newScores);
+  setRoundResult({ first: "", second: "", third: "" });
+};
+
 
    // ดาวน์โหลด Excel
   const downloadExcel = () => {
@@ -649,6 +694,7 @@ const carMap = {
 };
 
 
+
   return (
     <>
     {isLoading && (
@@ -685,6 +731,55 @@ const carMap = {
         </motion.div>
       </motion.div>
     )}
+      {explosion && (
+  <motion.div
+    className="fixed inset-0 z-[99999] flex items-center justify-center bg-black"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+  >
+    {/* FLASH */}
+    <motion.div
+      className="absolute inset-0 bg-white"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 1, 0] }}
+      transition={{ duration: 0.4 }}
+    />
+
+    {/* SHAKE */}
+    <motion.div
+      initial={{ scale: 0.6, rotate: 0 }}
+      animate={{
+        scale: [0.6, 1.2, 1],
+        rotate: [0, 3, -3, 2, -2, 0],
+      }}
+      transition={{ duration: 0.8 }}
+      className="text-center"
+    >
+      <div className="text-[5rem] font-extrabold text-red-500 drop-shadow-[0_0_40px_rgba(255,0,0,0.9)]">
+        💥 BOOM!
+      </div>
+
+      <div className="mt-4 text-3xl font-extrabold text-white tracking-widest">
+        คุณ <span className="text-red-400">{explosion.loser}</span>
+      </div>
+
+      <div className="text-2xl font-bold text-yellow-400 mt-2">
+        ถูกชนโดย {explosion.winner}
+      </div>
+    </motion.div>
+
+    {/* AUTO CLOSE */}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 3 }}
+      onAnimationComplete={() => setExplosion(null)}
+    />
+  </motion.div>
+)}
+
+    
 
       {/* ******************* แจ้งเตือนเวลาโบนัส ******************* */}
       {bonusAlert && (
