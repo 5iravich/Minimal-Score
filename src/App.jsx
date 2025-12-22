@@ -1007,7 +1007,7 @@ const carMap = {
                     transition={{ duration: 0.4 }}
                     className="absolute top-13 left-5/6 -translate-x-1/2
                               px-3 py-0.5
-                              text-8xl font-extrabold tracking-widest text-orange-500/30
+                              text-8xl font-extrabold tracking-widest text-orange-500/10
                               animate-pulse z-10"
                     style={{rotate: -90}}
                   >
@@ -1022,7 +1022,7 @@ const carMap = {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
                     className="absolute top-13 left-5/6 -translate-x-1/2
-                              px-3 py-0.5 text-5xl font-extrabold tracking-widest text-white/30
+                              px-3 py-0.5 text-5xl font-extrabold tracking-widest text-white/10
                               animate-pulse z-10"
                     style={{rotate: -90}}
                   >
@@ -1169,7 +1169,7 @@ const carMap = {
               <div className="text-gray-300 text-xs mb-2">{r.time}</div>
               <div className="flex justify-center">
                 <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white -skew-x-25 rounded-l-md border-r-5 ${ScoreMap[r.first]}`}>🥇 {r.first}</div>
-                <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white -skew-x-25 border-r-5 ${ScoreMap[r.second]}`}>🥇 {r.second}</div>
+                <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white -skew-x-25 border-r-5 ${ScoreMap[r.second]}`}>🥈 {r.second}</div>
                 <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white -skew-x-25 rounded-r-md border-r-5 ${ScoreMap[r.third]}`}>🥉 {r.third}</div>
               </div>
               {r.bonus && (
