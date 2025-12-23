@@ -14,66 +14,67 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, C
 
 export default function App() {
   
+  // หน้าโหลด
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-  const timer = setTimeout(() => {
-    setIsLoading(false);
-  }, 2500); // ⏱ ปรับเวลาได้
-    return () => clearTimeout(timer);
-}, []);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2500); // ⏱ ปรับเวลาได้
+      return () => clearTimeout(timer);
+  }, []);
 
-  function LoadingScreen({ carRed, carGreen, carBlue }) {
-  return (
-    <motion.div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-950 overflow-hidden"
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      {/* แสงวิ่ง */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse" />
+    function LoadingScreen({ carRed, carGreen, carBlue }) {
+    return (
+      <motion.div
+        className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-950 overflow-hidden"
+        initial={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* แสงวิ่ง */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse" />
 
-      {/* รถวิ่ง */}
-      <div className="relative w-full max-w-md h-40">
-        <motion.img
-          src={carRed}
-          className="absolute w-28 mx-10 rotate-90"
-          initial={{ x: -200 }}
-          animate={{ x: 420 }}
-          transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
-        />
-        <motion.img
-          src={carGreen}
-          className="absolute w-28 mx-40 rotate-90 top-10"
-          initial={{ x: -260 }}
-          animate={{ x: 420 }}
-          transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
-        />
-        <motion.img
-          src={carBlue}
-          className="absolute w-28 mx-70 rotate-90 top-20"
-          initial={{ x: -320 }}
-          animate={{ x: 420 }}
-          transition={{ repeat: Infinity, duration: 1.6, ease: "linear" }}
-        />
-      </div>
-
-      {/* ข้อความ */}
-      <div className="absolute bottom-24 text-center">
-        <motion.div
-          className="text-xl font-extrabold tracking-widest"
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ repeat: Infinity, duration: 1.2 }}
-        >
-          กำลังโหลดทรัพยากร
-        </motion.div>
-        <div className="text-xs text-gray-400 mt-2">
-          เตรียมความพร้อมสนาม...
+        {/* รถวิ่ง */}
+        <div className="relative w-full max-w-md h-40">
+          <motion.img
+            src={carRed}
+            className="absolute w-28 mx-10 rotate-90"
+            initial={{ x: -200 }}
+            animate={{ x: 420 }}
+            transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
+          />
+          <motion.img
+            src={carGreen}
+            className="absolute w-28 mx-40 rotate-90 top-10"
+            initial={{ x: -260 }}
+            animate={{ x: 420 }}
+            transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
+          />
+          <motion.img
+            src={carBlue}
+            className="absolute w-28 mx-70 rotate-90 top-20"
+            initial={{ x: -320 }}
+            animate={{ x: 420 }}
+            transition={{ repeat: Infinity, duration: 1.6, ease: "linear" }}
+          />
         </div>
-      </div>
-    </motion.div>
-  );
-}
+
+        {/* ข้อความ */}
+        <div className="absolute bottom-24 text-center">
+          <motion.div
+            className="text-xl font-extrabold tracking-widest"
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ repeat: Infinity, duration: 1.2 }}
+          >
+            กำลังโหลดทรัพยากร
+          </motion.div>
+          <div className="text-xs text-gray-400 mt-2">
+            เตรียมความพร้อมสนาม...
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   const players = ["Meen", "Cho", "Faii"]; // รายชื่อผู้แข่งขัน
 
@@ -144,37 +145,8 @@ export default function App() {
 
     return minutes >= start && minutes <= end;
   };
-  
+
   // บันทึกคะแนน
-  // const handleSubmit = () => {
-  //   if (!roundResult.first || !roundResult.second || !roundResult.third) return;
-
-  //   const newScores = { ...scores };
-  //   const isBonus = isBonusTime();
-  //   const bonus = isBonusTime() ? 2 : 1;
-
-  //   newScores[roundResult.first] += 2 * bonus;
-  //   newScores[roundResult.second] += 1 * bonus;
-
-  //   // 🥉 ที่ 3 ได้แต้มเฉพาะช่วงโบนัส
-  //   if (isBonus) {
-  //     newScores[roundResult.third] += 1;
-  //   }
-
-  //   // บันทึกลง history
-  //   const newRound = {
-  //     time: new Date().toLocaleString(),
-  //     first: roundResult.first,
-  //     second: roundResult.second,
-  //     third: roundResult.third,
-  //     bonus: isBonusTime(),
-  //   };
-
-  //     setHistory((h) => [...h, newRound]);
-  //     setScores(newScores);
-
-  //     setRoundResult({ first: "", second: "", third: "" });
-  // };
   const [explosion, setExplosion] = useState(null);
 
   const handleSubmit = () => {
@@ -188,6 +160,8 @@ export default function App() {
     prevWinner ? getCurrentWinStreak(prevWinner) : 0;
 
   // 👉 ถ้ามีคนชนะติด ≥ 3 และรอบนี้แพ้
+  let killEvent = null;
+
   if (
     prevWinner &&
     prevStreak >= 3 &&
@@ -197,7 +171,18 @@ export default function App() {
       loser: prevWinner,
       winner: roundResult.first,
     });
+    // 📊 สถิติสะสม
+    setKillStats((k) => ({
+      ...k,
+      [roundResult.first]: (k[roundResult.first] || 0) + 1,
+    }));
+    killEvent = {
+    killer: roundResult.first,
+    victim: prevWinner,
+  };
   }
+
+
 
   const newScores = { ...scores };
   const isBonus = isBonusTime();
@@ -213,11 +198,14 @@ export default function App() {
     second: roundResult.second,
     third: roundResult.third,
     bonus: isBonus,
+    kill: killEvent,
   };
 
   setHistory((h) => [...h, newRound]);
   setScores(newScores);
   setRoundResult({ first: "", second: "", third: "" });
+
+  
 };
 
 
@@ -693,7 +681,45 @@ const carMap = {
   Faii: carBlue,
 };
 
+const [killStats, setKillStats] = useState(() => {
+  const saved = localStorage.getItem("killStats");
+  return saved
+    ? JSON.parse(saved)
+    : { Meen: 0, Cho: 0, Faii: 0 };
+});
 
+useEffect(() => {
+  localStorage.setItem("killStats", JSON.stringify(killStats));
+}, [killStats]);
+
+const bestKiller = Math.max(...Object.values(killStats));
+
+const isTopKiller = (p) =>
+  killStats[p] === bestKiller && bestKiller > 0;
+
+const getKillTimeline = () => {
+  const map = {};
+
+  history.forEach((h) => {
+    if (!h.kill) return;
+
+    const key = `${h.kill.killer}→${h.kill.victim}`;
+
+    if (!map[key]) {
+      map[key] = {
+        killer: h.kill.killer,
+        victim: h.kill.victim,
+        count: 0,
+      };
+    }
+
+    map[key].count += 1;
+  });
+
+  return Object.values(map).sort((a, b) => b.count - a.count);
+};
+
+const killTimeline = getKillTimeline();
 
   return (
     <>
@@ -732,52 +758,52 @@ const carMap = {
       </motion.div>
     )}
       {explosion && (
-  <motion.div
-    className="fixed inset-0 z-[99999] flex items-center justify-center bg-black"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-  >
-    {/* FLASH */}
-    <motion.div
-      className="absolute inset-0 bg-white"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: [0, 1, 0] }}
-      transition={{ duration: 0.4 }}
-    />
+        <motion.div
+          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          {/* FLASH */}
+          <motion.div
+            className="absolute inset-0 bg-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 0] }}
+            transition={{ duration: 0.4 }}
+          />
 
-    {/* SHAKE */}
-    <motion.div
-      initial={{ scale: 0.6, rotate: 0 }}
-      animate={{
-        scale: [0.6, 1.2, 1],
-        rotate: [0, 3, -3, 2, -2, 0],
-      }}
-      transition={{ duration: 0.8 }}
-      className="text-center"
-    >
-      <div className="text-[5rem] font-extrabold text-red-500 drop-shadow-[0_0_40px_rgba(255,0,0,0.9)]">
-        💥 BOOM!
-      </div>
+          {/* SHAKE */}
+          <motion.div
+            initial={{ scale: 0.6, rotate: 0 }}
+            animate={{
+              scale: [0.6, 1.2, 1],
+              rotate: [0, 3, -3, 2, -2, 0],
+            }}
+            transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <div className="text-[5rem] font-extrabold text-red-500 drop-shadow-[0_0_40px_rgba(255,0,0,0.9)]">
+              💥 บร๊ะ!
+            </div>
 
-      <div className="mt-4 text-3xl font-extrabold text-white tracking-widest">
-        คุณ <span className="text-red-400">{explosion.loser}</span>
-      </div>
+            <div className="mt-4 text-3xl font-extrabold text-white tracking-widest">
+              อา <span className="text-red-300">{explosion.loser}</span>
+            </div>
 
-      <div className="text-2xl font-bold text-yellow-400 mt-2">
-        ถูกชนโดย {explosion.winner}
-      </div>
-    </motion.div>
+            <div className="text-2xl font-bold text-gray-400 mt-2">
+              ถูกอา {explosion.winner} ล้มเหลียว 
+            </div>
+          </motion.div>
 
-    {/* AUTO CLOSE */}
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 3 }}
-      onAnimationComplete={() => setExplosion(null)}
-    />
-  </motion.div>
-)}
+          {/* AUTO CLOSE */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 3 }}
+            onAnimationComplete={() => setExplosion(null)}
+          />
+        </motion.div>
+      )}
 
     
 
@@ -1007,7 +1033,7 @@ const carMap = {
                     transition={{ duration: 0.4 }}
                     className="absolute top-13 left-5/6 -translate-x-1/2
                               px-3 py-0.5
-                              text-8xl font-extrabold tracking-widest text-orange-500/10
+                              text-8xl font-extrabold tracking-widest text-orange-500/5
                               animate-pulse z-10"
                     style={{rotate: -90}}
                   >
@@ -1022,15 +1048,13 @@ const carMap = {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
                     className="absolute top-13 left-5/6 -translate-x-1/2
-                              px-3 py-0.5 text-5xl font-extrabold tracking-widest text-white/10
+                              px-3 py-0.5 text-5xl font-extrabold tracking-widest text-white/5
                               animate-pulse z-10"
                     style={{rotate: -90}}
                   >
                     TILTED
                   </motion.div>
                 )}
-
-
             </div>
           </div>
         )})}
@@ -1117,7 +1141,7 @@ const carMap = {
 
   {/* Toggle button */}
   <button onClick={() => setShowHistory((s) => !s)}
-    className="w-full p-2 px-5 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center mb-4 transition"
+    className="w-full p-1 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center mb-4 transition"
   >
     {showHistory ? (
       <span className="text-sm">◀</span>
@@ -1147,7 +1171,7 @@ const carMap = {
               <div className={`relative p-3 text-sm hover:shadow-lg rounded-xl
                 border border-l-4 border-white/10
                 ${firstPlaceColorMap[r.first] ?? "border-l-gray-500"}
-                hover:scale-[1.02] transition-all duration-300 overflow-hidden`}
+                hover:scale-[1.02] transition-all duration-300 -skew-x-5 overflow-hidden`}
               >
                 {/* 🔥 LATEST BADGE */}
                 {isLatest && (
@@ -1168,15 +1192,26 @@ const carMap = {
                 <img className={`absolute opacity-20 -z-100 scale-300 group-hover:scale-350 transition-transform duration-500 `} src={pattern} alt="pattern" />
               <div className="text-gray-300 text-xs mb-2">{r.time}</div>
               <div className="flex justify-center">
-                <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white -skew-x-25 rounded-l-md border-r-5 ${ScoreMap[r.first]}`}>🥇 {r.first}</div>
-                <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white -skew-x-25 border-r-5 ${ScoreMap[r.second]}`}>🥈 {r.second}</div>
-                <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white -skew-x-25 rounded-r-md border-r-5 ${ScoreMap[r.third]}`}>🥉 {r.third}</div>
+                <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white rounded-l-md border-r-5 ${ScoreMap[r.first]}`}>🥇 {r.first}</div>
+                <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white border-r-5 ${ScoreMap[r.second]}`}>🥈 {r.second}</div>
+                <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white rounded-r-md border-r-5 ${ScoreMap[r.third]}`}>🥉 {r.third}</div>
               </div>
               {r.bonus && (
                 <div className="text-xs text-gray-900 bg-yellow-400/70 font-bold text-center mt-2 rounded-full">
                   ⚡ PEAK TIME ZONE // BONUS TIME x 2
                 </div>
               )}
+              {r.kill && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-2 text-xs font-extrabold text-center
+                            bg-blue-500/70 text-white rounded-full"
+                >
+                  🌠 {r.kill.killer} ได้สกัดดาวรุ่ง {r.kill.victim}
+                </motion.div>
+              )}
+
               </div>
               
               
@@ -1282,8 +1317,50 @@ const carMap = {
                 <p className="text-[0.75rem]">แพ้ติดต่อกันสูงสุด</p>
                 <p className="mt-2 text-3xl">💀 {loseStreaks[activePlayer]}</p>
               </div>
+              <div className="m-2 p-3 text-blue-400 font-semibold bg-blue-500/30 rounded-xl hover:scale-105 transition-all duration-300">
+                <p className="text-[0.75rem]">สกัดดาวรุ่งพุ่งแรง</p>
+                <p className="mt-2 text-3xl">
+                  🌠 {killStats[activePlayer] || 0}
+                </p>
+              </div>
             </div>
           </div>
+
+          <div className="mt-4 p-4 rounded-2xl border border-blue-500/30">
+  <h3 className="text-sm font-extrabold text-blue-400 mb-3 text-center">
+    🌠 สถิติสกัดดาวรุ่งตลอดกาล
+  </h3>
+
+  {killTimeline.length === 0 ? (
+    <div className="text-center text-gray-400 text-xs">
+      ยังไม่มีสถิติสกัดดาวรุ่ง
+    </div>
+  ) : (
+    <div className="space-y-2">
+      {killTimeline.map((k, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex items-center justify-between
+                     bg-black/40 rounded-xl px-3 py-2
+                     hover:scale-[1.02] transition"
+        >
+          <div className="text-sm font-bold">
+            <span className="text-green-400">{k.killer}</span>
+            <span className="mx-2 text-gray-400">สกัดดาวรุ่ง</span>
+            <span className="text-red-400">{k.victim}</span>
+          </div>
+
+          <div className="text-xs font-extrabold text-blue-400">
+            🌠 {k.count} ครั้ง
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  )}
+</div>
+
             {/* Progress เทียบผู้นำ */}
             <div className="mt-4">
               <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -1299,9 +1376,9 @@ const carMap = {
                 />
               </div>
               <div className="flex justify-between text-xs text-gray-400 mt-1">
-                <span>คะแนน</span>
+                <span>💎คะแนน</span>
                 <span>
-                  {scores[activePlayer]} / {scores[getLeader()]}
+                  {scores[activePlayer]} / {scores[getLeader()]} 🥤
                 </span>
               </div>
             </div>
