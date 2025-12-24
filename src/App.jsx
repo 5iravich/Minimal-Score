@@ -163,7 +163,6 @@ export default function App() {
 
   // 👉 ถ้ามีคนชนะติด ≥ 3 และรอบนี้แพ้
   let killEvent = null;
-
   if (
     prevWinner &&
     prevStreak >= 3 &&
@@ -1070,8 +1069,8 @@ const buildKillMatrixFromHistory = (history, players) => {
                       }}
                     />
                   ))}
-                  <div className="absolute top-0 w-full h-20 bg-gradient-to-t from-transparent to-gray-900/80 animate-[fire_1s_infinite]" />
-                  <img src={lose} alt="lose" className="absolute inset-0 h-full opacity-10 z-0" />
+                  {/* <div className="absolute top-0 w-full h-20 bg-gradient-to-t from-transparent to-gray-900/80 animate-[fire_1s_infinite]" />
+                  <img src={lose} alt="lose" className="absolute inset-0 h-full opacity-10 z-0" /> */}
                 </div>
                 
               )}
