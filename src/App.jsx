@@ -724,20 +724,6 @@ useEffect(() => {
 
 const bestKiller = Math.max(...Object.values(killStats));
 
-const isTopKiller = (p) =>
-  killStats[p] === bestKiller && bestKiller > 0;
-
-const [killMatrix, setKillMatrix] = useState(() => {
-  const saved = localStorage.getItem("killMatrix");
-  if (saved) return JSON.parse(saved);
-
-  // 🔁 ไม่มี killMatrix → สร้างจาก history เดิม
-  return buildKillMatrixFromHistory(
-    JSON.parse(localStorage.getItem("history") || "[]"),
-    ["Meen", "Cho", "Faii"]
-  );
-});
-
 const buildKillMatrixFromHistory = (history, players) => {
   const matrix = {};
 
@@ -756,6 +742,22 @@ const buildKillMatrixFromHistory = (history, players) => {
 
   return matrix;
 };
+
+
+const isTopKiller = (p) =>
+  killStats[p] === bestKiller && bestKiller > 0;
+
+const [killMatrix, setKillMatrix] = useState(() => {
+  const saved = localStorage.getItem("killMatrix");
+  if (saved) return JSON.parse(saved);
+
+  // 🔁 ไม่มี killMatrix → สร้างจาก history เดิม
+  return buildKillMatrixFromHistory(
+    JSON.parse(localStorage.getItem("history") || "[]"),
+    ["Meen", "Cho", "Faii"]
+  );
+});
+
 
 
 useEffect(() => {
