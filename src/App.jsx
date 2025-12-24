@@ -475,6 +475,26 @@ const formatTime = (sec) => {
 
 const isCritical = bonusRemain > 0 && bonusRemain < 60;
 
+const getWinLoseStreak = (history, player) => {
+  let winStreak = 0;
+  let loseStreak = 0;
+
+  for (let i = history.length - 1; i >= 0; i--) {
+    const h = history[i];
+
+    if (h.winner === player) {
+      if (loseStreak > 0) break;
+      winStreak++;
+    } else {
+      if (winStreak > 0) break;
+      loseStreak++;
+    }
+  }
+
+  return { winStreak, loseStreak };
+};
+
+
 const getWinStreaks = () => {
   const streaks = {};
   players.forEach(p => (streaks[p] = 0));
@@ -522,6 +542,8 @@ const getPlayerStats = (player) => {
 
   return { first, second, third, winRate };
 };
+
+
 
 const [activePlayer, setActivePlayer] = useState(null);
 
@@ -1054,7 +1076,7 @@ const buildKillMatrixFromHistory = (history, players) => {
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(255,100,0,0.9),transparent_70%)] blur-xl animate-pulse -z-999" />
                   {/* flame */}
                   <div className="absolute bottom-0 w-full h-20 bg-gradient-to-t from-orange-500/80 to-transparent animate-[fire_1s_infinite]" />
-                  {/* <img src={onfire} alt="onfire" className="absolute inset-0 h-full scale-300 opacity-10 z-0" /> */}
+                  <img src={onfire} alt="onfire" className="absolute inset-0 h-full scale-300 opacity-10 z-0" />
                 </div>
               )}
               {loseStreak >= 3 && (
@@ -1069,8 +1091,8 @@ const buildKillMatrixFromHistory = (history, players) => {
                       }}
                     />
                   ))}
-                  {/* <div className="absolute top-0 w-full h-20 bg-gradient-to-t from-transparent to-gray-900/80 animate-[fire_1s_infinite]" />
-                  <img src={lose} alt="lose" className="absolute inset-0 h-full opacity-10 z-0" /> */}
+                  <div className="absolute top-0 w-full h-20 bg-gradient-to-t from-transparent to-gray-900/80 animate-[fire_1s_infinite]" />
+                  <img src={lose} alt="lose" className="absolute inset-0 h-full opacity-10 z-0" />
                 </div>
                 
               )}
