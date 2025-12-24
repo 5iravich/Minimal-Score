@@ -151,6 +151,20 @@ export default function App() {
   // บันทึกคะแนน
   const [explosion, setExplosion] = useState(null);
 
+  function getCurrentWinStreak(player) {
+  let streak = 0;
+
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].first === player) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
+
   const handleSubmit = () => {
   if (!roundResult.first || !roundResult.second || !roundResult.third) return;
 
@@ -650,19 +664,7 @@ const getLoseStreaks = () => {
 
 const loseStreaks = getLoseStreaks();
 
-const getCurrentWinStreak = (player) => {
-  let streak = 0;
 
-  for (let i = history.length - 1; i >= 0; i--) {
-    if (history[i].first === player) {
-      streak++;
-    } else {
-      break; // แพ้ = หยุดทันที
-    }
-  }
-
-  return streak;
-};
 
 const getCurrentLoseStreak = (player) => {
   let streak = 0;
