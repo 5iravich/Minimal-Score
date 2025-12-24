@@ -9,6 +9,8 @@ import carBlue from "/src/assets/Faii.png";
 import circuit from "/src/assets/Japan_Circuit.avif"
 import loop from "/src/assets/223594.gif"
 import finish from "/src/assets/checker.jpg"
+import onfire from "/src/assets/onfire.gif"
+import lose from "/src/assets/lose.gif"
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, Cell } from "recharts";
 
@@ -176,6 +178,13 @@ export default function App() {
       ...k,
       [roundResult.first]: (k[roundResult.first] || 0) + 1,
     }));
+    setKillMatrix((m) => ({
+    ...m,
+    [roundResult.first]: {
+      ...m[roundResult.first],
+      [prevWinner]: (m[roundResult.first]?.[prevWinner] || 0) + 1,
+    },
+  }));
     killEvent = {
     killer: roundResult.first,
     victim: prevWinner,
@@ -697,29 +706,66 @@ const bestKiller = Math.max(...Object.values(killStats));
 const isTopKiller = (p) =>
   killStats[p] === bestKiller && bestKiller > 0;
 
-const getKillTimeline = () => {
-  const map = {};
+const [killMatrix, setKillMatrix] = useState(() => {
+  const saved = localStorage.getItem("killMatrix");
+  if (saved) return JSON.parse(saved);
 
-  history.forEach((h) => {
-    if (!h.kill) return;
+  // 🔁 ไม่มี killMatrix → สร้างจาก history เดิม
+  return buildKillMatrixFromHistory(
+    JSON.parse(localStorage.getItem("history") || "[]"),
+    ["Meen", "Cho", "Faii"]
+  );
+});
 
-    const key = `${h.kill.killer}→${h.kill.victim}`;
 
-    if (!map[key]) {
-      map[key] = {
-        killer: h.kill.killer,
-        victim: h.kill.victim,
-        count: 0,
-      };
-    }
+useEffect(() => {
+  localStorage.setItem("killMatrix", JSON.stringify(killMatrix));
+}, [killMatrix]);
 
-    map[key].count += 1;
-  });
+useEffect(() => {
+  setKillMatrix(
+    buildKillMatrixFromHistory(history, players)
+  );
+}, [history]);
 
-  return Object.values(map).sort((a, b) => b.count - a.count);
+const getKillsByPlayer = (player) => {
+  return killMatrix[player] || {};
 };
 
-const killTimeline = getKillTimeline();
+const getNemesis = (player) => {
+  let max = 0;
+  let nemesis = null;
+
+  players.forEach((p) => {
+    if (p === player) return;
+    const count = killMatrix[p]?.[player] || 0;
+    if (count > max) {
+      max = count;
+      nemesis = p;
+    }
+  });
+
+  return max >= 3 ? { nemesis, count: max } : null;
+};
+
+const buildKillMatrixFromHistory = (history, players) => {
+  const matrix = {};
+
+  players.forEach((p) => {
+    matrix[p] = {};
+    players.forEach((op) => {
+      if (op !== p) matrix[p][op] = 0;
+    });
+  });
+
+  history.forEach((h) => {
+    if (h.kill?.killer && h.kill?.victim) {
+      matrix[h.kill.killer][h.kill.victim] += 1;
+    }
+  });
+
+  return matrix;
+};
 
   return (
     <>
@@ -969,18 +1015,18 @@ const killTimeline = getKillTimeline();
                 : p === 'Cho' ? 'bg-gradient-to-br from-green-800 to-green-500' 
                 : 'bg-gradient-to-br from-blue-800 to-blue-500 z-20'}`}
 >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500 z-0"></div>
-              <h2 className="text-md font-semibold">{p}</h2>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500 z-10"></div>
+              <h2 className="text-md font-semibold z-20">{p}</h2>
               <motion.p key={scores[p]}
                 initial={{ scale: 1 }}
                 animate={{ scale: [1, 1.4, 1] }}
                 transition={{ duration: 0.4 }}
-                className="text-[2.5rem] font-bold -m-4">
+                className="text-[2.5rem] font-bold -m-4 z-20">
                 {scores[p]}
               </motion.p>
               {todayMVP.includes(p) && (
                 <motion.div
-                  className="absolute bottom-1.5 right-3.5 mt-1 px-3 text-[0.5rem] font-extrabold text-gray-900 bg-yellow-300/70 rounded-full z-10"
+                  className="absolute bottom-1.5 right-3.5 mt-1 px-3 text-[0.5rem] font-extrabold text-gray-900 bg-yellow-300/70 rounded-full z-30"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ repeat: Infinity, duration: 1.2 }}
                 >
@@ -989,8 +1035,8 @@ const killTimeline = getKillTimeline();
               )}
 
 
-              <p className="text-xs mt-1 opacity-70 z-10">อัตราชนะ</p>
-              <div className="flex justify-center z-10">
+              <p className="text-xs mt-1 opacity-70 z-20">อัตราชนะ</p>
+              <div className="flex justify-center z-20">
                 <WinRateCircle
                 percent={winRate(p)}
                 color={
@@ -1004,11 +1050,12 @@ const killTimeline = getKillTimeline();
               />
               </div>
               {winStreak >= 3 && (
-                <div className="absolute inset-0 z-0 pointer-events-none">
+                <div className="absolute inset-0 pointer-events-none">
                   {/* glow */}
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(255,100,0,0.9),transparent_70%)] blur-xl animate-pulse" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(255,100,0,0.9),transparent_70%)] blur-xl animate-pulse -z-999" />
                   {/* flame */}
                   <div className="absolute bottom-0 w-full h-20 bg-gradient-to-t from-orange-500/80 to-transparent animate-[fire_1s_infinite]" />
+                  <img src={onfire} alt="onfire" className="absolute inset-0 h-full scale-300 opacity-10 z-0" />
                 </div>
               )}
               {loseStreak >= 3 && (
@@ -1023,7 +1070,10 @@ const killTimeline = getKillTimeline();
                       }}
                     />
                   ))}
+                  <div className="absolute top-0 w-full h-20 bg-gradient-to-t from-transparent to-gray-900/80 animate-[fire_1s_infinite]" />
+                  <img src={lose} alt="lose" className="absolute inset-0 h-full opacity-10 z-0" />
                 </div>
+                
               )}
               {/* 🔥 ON FIRE */}
                 {winStreak >= 3 && (
@@ -1325,39 +1375,18 @@ const killTimeline = getKillTimeline();
               </div>
             </div>
           </div>
+          <div className="mt-3 p-3 bg-blue-500/20 rounded-xl">
+  <div className="text-sm font-bold text-blue-400 mb-2">
+    🧱 จารึกสกัดดาวรุ่ง
+  </div>
 
-          <div className="mt-4 p-4 rounded-2xl border border-blue-500/30">
-  <h3 className="text-sm font-extrabold text-blue-400 mb-3 text-center">
-    🌠 สถิติสกัดดาวรุ่งตลอดกาล
-  </h3>
-
-  {killTimeline.length === 0 ? (
-    <div className="text-center text-gray-400 text-xs">
-      ยังไม่มีสถิติสกัดดาวรุ่ง
-    </div>
-  ) : (
-    <div className="space-y-2">
-      {killTimeline.map((k, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="flex items-center justify-between
-                     bg-black/40 rounded-xl px-3 py-2
-                     hover:scale-[1.02] transition"
-        >
-          <div className="text-sm font-bold">
-            <span className="text-green-400">{k.killer}</span>
-            <span className="mx-2 text-gray-400">สกัดดาวรุ่ง</span>
-            <span className="text-red-400">{k.victim}</span>
-          </div>
-
-          <div className="text-xs font-extrabold text-blue-400">
-            🌠 {k.count} ครั้ง
-          </div>
-        </motion.div>
-      ))}
-    </div>
+  {Object.entries(killMatrix[activePlayer] || {}).map(
+    ([victim, count]) =>
+      count > 0 && (
+        <div key={victim} className="text-sm text-blue-400">
+          ⚔️ สกัดดาวรุ่งอา {victim} จำนวน {count} ครั้ง
+        </div>
+      )
   )}
 </div>
 
