@@ -1054,7 +1054,7 @@ const buildKillMatrixFromHistory = (history, players) => {
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(255,100,0,0.9),transparent_70%)] blur-xl animate-pulse -z-999" />
                   {/* flame */}
                   <div className="absolute bottom-0 w-full h-20 bg-gradient-to-t from-orange-500/80 to-transparent animate-[fire_1s_infinite]" />
-                  <img src={onfire} alt="onfire" className="absolute inset-0 h-full scale-300 opacity-10 z-0" />
+                  {/* <img src={onfire} alt="onfire" className="absolute inset-0 h-full scale-300 opacity-10 z-0" /> */}
                 </div>
               )}
               {loseStreak >= 3 && (
