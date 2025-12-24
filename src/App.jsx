@@ -12,11 +12,12 @@ import finish from "/src/assets/checker.jpg"
 import onfire from "/src/assets/onfire.gif"
 import lose from "/src/assets/lose.gif"
 
+
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, Cell } from "recharts";
 
 export default function App() {
   
-  // หน้าโหลด
+  // *****************************หน้าโหลด******************************
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -78,6 +79,8 @@ export default function App() {
     );
   }
 
+  //*******************************************************************
+
   const players = ["Meen", "Cho", "Faii"]; // รายชื่อผู้แข่งขัน
 
   const firstPlaceColorMap = {
@@ -98,6 +101,7 @@ export default function App() {
   Faii: "border-blue-900",
 };
 
+//*******************************************************************
 
   // เริ่มคะแนน
   const [scores, setScores] = useState(() => {
@@ -204,8 +208,6 @@ export default function App() {
   };
   }
 
-
-
   const newScores = { ...scores };
   const isBonus = isBonusTime();
   const bonus = isBonus ? 2 : 1;
@@ -229,7 +231,6 @@ export default function App() {
 
   
 };
-
 
    // ดาวน์โหลด Excel
   const downloadExcel = () => {
@@ -418,7 +419,7 @@ export default function App() {
   const [bonusAlert, setBonusAlert] = useState(false);
   const [preBonusCountdown, setPreBonusCountdown] = useState(null);
 
-
+// ********************จับเวลาโบนัส******************************
   useEffect(() => {
   const interval = setInterval(() => {
     const now = new Date();
@@ -450,7 +451,6 @@ export default function App() {
 
   return () => clearInterval(interval);
 }, []);
-
 
 const getBonusRemaining = () => {
   const now = new Date();
@@ -488,6 +488,8 @@ const formatTime = (sec) => {
 };
 
 const isCritical = bonusRemain > 0 && bonusRemain < 60;
+
+//**************************************************************** */
 
 const getWinLoseStreak = (history, player) => {
   let winStreak = 0;
@@ -1283,7 +1285,7 @@ const getNemesis = (player) => {
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-2 text-xs font-extrabold text-center
-                            bg-blue-500/70 text-white rounded-full"
+                            bg-blue-500/30 text-white rounded-full"
                 >
                   🌠 {r.kill.killer} ได้สกัดดาวรุ่ง {r.kill.victim}
                 </motion.div>
@@ -1403,19 +1405,19 @@ const getNemesis = (player) => {
             </div>
           </div>
           <div className="mt-3 p-3 bg-blue-500/20 rounded-xl">
-  <div className="text-sm font-bold text-blue-400 mb-2">
-    🧱 จารึกสกัดดาวรุ่ง
-  </div>
+              <div className="text-sm font-bold text-blue-400 mb-2">
+                🌠 จารึกสกัดดาวรุ่ง
+              </div>
 
-  {Object.entries(killMatrix[activePlayer] || {}).map(
-    ([victim, count]) =>
-      count > 0 && (
-        <div key={victim} className="text-sm text-blue-400">
-          ⚔️ สกัดดาวรุ่งอา {victim} จำนวน {count} ครั้ง
-        </div>
-      )
-  )}
-</div>
+              {Object.entries(killMatrix[activePlayer] || {}).map(
+                ([victim, count]) =>
+                  count > 0 && (
+                    <div key={victim} className="text-sm text-blue-400">
+                      ⚔️ สกัดดาวรุ่งอา {victim} จำนวน {count} ครั้ง
+                    </div>
+                  )
+              )}
+            </div>
 
             {/* Progress เทียบผู้นำ */}
             <div className="mt-4">
