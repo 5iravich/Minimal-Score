@@ -11,12 +11,63 @@ import loop from "/src/assets/223594.gif"
 import finish from "/src/assets/checker.jpg"
 import onfire from "/src/assets/onfire.gif"
 import lose from "/src/assets/lose.gif"
+import cm from "/src/assets/cm.gif"
+import santa from "/src/assets/santa.gif"
 
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, Cell } from "recharts";
 
 export default function App() {
   
+  const getSeasonTheme = () => {
+  const now = new Date();
+  const m = now.getMonth() + 1;
+  const d = now.getDate();
+
+  // 🎄 Christmas: 20–26 Dec
+  if (m === 12 && d >= 20 && d <= 26) return "christmas";
+
+  // 🎆 New Year: 27 Dec – 5 Jan
+  if ((m === 12 && d >= 27) || (m === 1 && d <= 5)) return "newyear";
+
+  return "normal";
+};
+
+function Snow() {
+  return (
+    <div className="pointer-events-none fixed inset-0 z-10 overflow-hidden">
+      {[...Array(40)].map((_, i) => (
+        <span
+          key={i}
+          className="absolute top-0 w-1 h-1 bg-white rounded-full opacity-70 animate-[snow_8s_linear_infinite]"
+          style={{
+            left: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${6 + Math.random() * 4}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function Firework() {
+  return (
+    <motion.div
+      className="fixed inset-0 pointer-events-none z-20"
+      animate={{ opacity: [0, 1, 0] }}
+      transition={{ repeat: Infinity, duration: 2 }}
+    >
+      <div className="absolute top-1/4 left-1/2 text-6xl">🎆</div>
+      <div className="absolute top-1/3 left-1/3 text-5xl">✨</div>
+      <div className="absolute top-1/4 right-1/3 text-6xl">🎇</div>
+    </motion.div>
+  );
+}
+
+
+const [theme, setTheme] = useState(getSeasonTheme());
+
   // *****************************หน้าโหลด******************************
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
@@ -794,10 +845,208 @@ const getNemesis = (player) => {
   return max >= 3 ? { nemesis, count: max } : null;
 };
 
+const buildTimelineEvents = (history) => {
+  const events = [];
+
+  history.forEach((h, index) => {
+    const time = h.time;
+
+    // ⚡ Bonus
+    if (h.bonus) {
+      events.push({
+        time,
+        type: "bonus",
+        text: "BONUS TIME ⚡ คะแนน x2",
+      });
+    }
+
+    // 🏁 Winner
+    events.push({
+      time,
+      type: "win",
+      text: `🏆 ${h.first} ชนะรอบนี้`,
+      player: h.first,
+    });
+
+    // 💥 Kill Streak Broken
+    if (h.kill) {
+      events.push({
+        time,
+        type: "kill",
+        text: `💥 ${h.kill.killer} โค่น ${h.kill.victim}`,
+        killer: h.kill.killer,
+        victim: h.kill.victim,
+      });
+    }
+  });
+
+  return events.reverse(); // ใหม่อยู่บน
+};
+
+function EsportTimeline({ history }) {
+  const events = buildTimelineEvents(history);
+
+  const colorMap = {
+    bonus: "bg-yellow-500/20 text-yellow-300",
+    win: "bg-green-500/20 text-green-300",
+    kill: "bg-red-500/20 text-red-300",
+  };
+
+  return (
+    <div className="space-y-2">
+      {events.map((e, i) => (
+        <motion.div
+          key={i}
+          initial={{ x: -30, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className={`p-3 rounded-xl text-xs font-bold border-l-4
+            ${colorMap[e.type] || "bg-gray-700/30 text-gray-300"}`}
+        >
+          <div className="opacity-50 text-[0.65rem] mb-1">{e.time}</div>
+          {e.text}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+function SnowStorm({ bonus }) {
+  const count = bonus ? 120 : 40;
+
+  return (
+    <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden">
+      {[...Array(count)].map((_, i) => {
+        const size = bonus ? Math.random() * 3 + 1 : Math.random() * 2 + 1;
+
+        return (
+          <span
+            key={i}
+            className="absolute top-0 bg-white rounded-full opacity-80"
+            style={{
+              width: size,
+              height: size,
+              left: `${Math.random() * 100}%`,
+              animation: `
+                snow-fall ${bonus ? 4 + Math.random() * 3 : 7 + Math.random() * 4}s linear infinite,
+                snow-drift ${bonus ? 2 + Math.random() * 2 : 5 + Math.random() * 3}s ease-in-out infinite
+              `,
+              animationDelay: `${Math.random() * 3}s`,
+            }}
+          />
+        );
+      })}
+      
+    </div>
+  );
+}
+
+function SnowPile({ intensity }) {
+  const height = Math.min(180, 20 + intensity * 160); // px
+
+  return (
+    <div className="pointer-events-none fixed bottom-0 left-0 w-full z-30">
+      {/* ❄️ Base Snow */}
+      <div
+        className="w-full bg-gradient-to-t
+                   from-white/90 via-white/70 to-transparent
+                   blur-[1px]"
+        style={{
+          height,
+          transition: "height 1s ease-out"
+        }}
+      />
+
+      {/* 🌫️ Soft Edge */}
+      <div
+        className="absolute top-0 left-0 w-full h-6
+                   bg-white/50 blur-lg"
+      />
+    </div>
+  );
+}
+
+function SantaLoop() {
+  return (
+    <motion.div
+      className="pointer-events-none fixed inset-0 z-10"
+    >
+      <motion.img
+        src={santa}
+        alt="Santa"
+        className="absolute w-40 md:w-56 drop-shadow-2xl"
+        animate={{
+          x: ["1990%", "-200%"],
+          y: [120, 180, 120],
+          scale: [0.9, 2, 0.9]
+        }}
+        transition={{
+          duration: 10,
+          ease: "linear",
+          repeat: Infinity,
+          repeatType: "loop"
+        }}
+      />
+
+    </motion.div>
+  );
+}
+
+// function GiftDrop() {
+//   const [gifts, setGifts] = React.useState([]);
+
+//   React.useEffect(() => {
+//     const interval = setInterval(() => {
+//       setGifts((g) => [
+//         ...g,
+//         {
+//           id: Date.now(),
+//           x: 15 + Math.random() * 70
+//         }
+//       ]);
+//     }, 2000); // ทุก 2 วิ (ไม่รกเกิน)
+
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   return (
+//     <>
+//       {gifts.map((gift) => (
+//         <motion.div
+//           key={gift.id}
+//           className="fixed text-3xl z-30"
+//           initial={{
+//             x: `${gift.x}%`,
+//             y: 160,
+//             opacity: 1
+//           }}
+//           animate={{
+//             y: "90vh",
+//             opacity: 0
+//           }}
+//           transition={{ duration: 4, ease: "easeIn" }}
+//           onAnimationComplete={() =>
+//             setGifts((g) => g.filter((x) => x.id !== gift.id))
+//           }
+//         >
+//           🎁
+//         </motion.div>
+//       ))}
+//     </>
+//   );
+// }
+
 
 
   return (
     <>
+    {theme === "christmas" && <Snow />}
+        {theme === "christmas" && (
+      <SnowStorm bonus={isBonusTime} />
+    )}
+    {theme === "christmas" && <SantaLoop />}
+
+    {theme === "newyear" && <Firework />}
     {isLoading && (
       <LoadingScreen
         carRed={carRed}
@@ -806,7 +1055,22 @@ const getNemesis = (player) => {
       />
     )}
 
-    <div className="min-h-screen bg-gray-950 text-white overflow-hidden">
+    <div
+      className={`min-h-screen text-white overflow-hidden
+        ${theme === "christmas" && "bg-gradient-to-br from-red-900 via-green-900 to-gray-950"}
+        ${theme === "newyear" && "bg-gradient-to-br from-indigo-900 via-purple-900 to-black"}
+        ${theme === "normal" && "bg-gray-950"}
+      `}
+    >
+      
+      {isBonusTime && theme === "christmas" && (
+      <motion.div
+        className="fixed inset-0 z-0 bg-black/30 backdrop-blur-sm pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      />
+    )}
+
       <img src={loop} alt="loop" className="min-h-screen scale-150 opacity-3 " />
 
       {/* ⏱ PRE BONUS COUNTDOWN */}
@@ -1044,6 +1308,20 @@ const getNemesis = (player) => {
                 : p === 'Cho' ? 'bg-gradient-to-br from-green-800 to-green-500' 
                 : 'bg-gradient-to-br from-blue-800 to-blue-500 z-20'}`}
 >
+              {theme === "christmas" && (
+                <div className="absolute top-2 left-2 text-[0.6rem] font-bold bg-red-600 px-1 py-0.5 rounded-full">
+                  🎄
+                </div>
+              )}
+              {theme === "newyear" && (
+                <motion.div
+                  className="absolute top-2 left-2 text-[0.6rem] font-bold bg-yellow-500 px-1 py-0.5 rounded-full"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 1 }}
+                >
+                  🎆
+                </motion.div>
+              )}
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500 z-10"></div>
               <h2 className="text-md font-semibold z-20">{p}</h2>
               <motion.p key={scores[p]}
@@ -1258,8 +1536,8 @@ const getNemesis = (player) => {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.3 }}
-                    className="absolute top-5 -right-6 py-0.5
-                              text-xl font-extrabold
+                    className="absolute top-5 -right-8 py-2
+                              text-2xl font-extrabold
                               text-yellow-200/30
                               animate-pulse -z-10"
                     style={{rotate: -90}}
@@ -1269,14 +1547,14 @@ const getNemesis = (player) => {
                 )}
                 <div className={`absolute top-0 right-5 w-15 h-15 ${OPlaceColorMap[r.first] ?? "bg-gray-500/10" } rounded-xl -mr-12 -mb-12 group-hover:scale-150 transition-transform duration-500 -z-30`}></div>
                 <img className={`absolute opacity-20 -z-100 scale-300 group-hover:scale-350 transition-transform duration-500 `} src={pattern} alt="pattern" />
-              <div className="text-gray-300 text-xs mb-2">{r.time}</div>
+              <div className="text-gray-300 text-[0.65rem] font-bold mb-1">{r.time}</div>
               <div className="flex justify-center">
                 <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white rounded-l-md border-r-5 ${ScoreMap[r.first]}`}>🥇 {r.first}</div>
                 <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white border-r-5 ${ScoreMap[r.second]}`}>🥈 {r.second}</div>
                 <div className={`py-1 px-3 font-semibold text-xs text-gray-900 bg-white rounded-r-md border-r-5 ${ScoreMap[r.third]}`}>🥉 {r.third}</div>
               </div>
               {r.bonus && (
-                <div className="text-xs text-gray-900 bg-yellow-400/70 font-bold text-center mt-2 rounded-full">
+                <div className="text-[0.65rem] text-gray-900 bg-yellow-400/70 font-bold text-center mt-1 rounded-full">
                   ⚡ PEAK TIME ZONE // BONUS TIME x 2
                 </div>
               )}

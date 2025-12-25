@@ -121,4 +121,20 @@ h1 {
   animation: shake 0.5s ease-in-out;
 }
 
+@keyframes snow {
+  0% { transform: translateY(-10px); }
+  100% { transform: translateY(110vh); }
+}
+
+@keyframes snow-fall {
+  0% { transform: translateY(-10px); }
+  100% { transform: translateY(110vh); }
+}
+
+@keyframes snow-drift {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(30px); }
+  100% { transform: translateX(0); }
+}
+
 
