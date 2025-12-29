@@ -1082,7 +1082,7 @@ function SantaLoop() {
               <div className="bg-gradient-to-br from-yellow-400 to-orange-500 p-6 rounded-2xl shadow-2xl text-center max-w-sm">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500"></div>
                 <h2 className="text-2xl font-extrabold mb-2 text-black">⚡ เวลาโบนัสมาแว้วววววววววว!</h2>
-                <p className="text-black font-semibold mb-4">ตั้งแต่เวลา 16:15 – 16:35 น. คะแนนที่ได้จะคูณสอง</p>
+                <p className="text-black font-semibold mb-4">ตั้งแต่เวลา 10:10 – 16:35 น. คะแนนที่ได้จะคูณสอง</p>
                 <button onClick={() => setBonusAlert(false)} className="bg-black hover:bg-black/70 text-white px-4 py-2 rounded-xl font-bold hover:scale-105 transition">
                   เข้าใจแล้ว
                 </button>
