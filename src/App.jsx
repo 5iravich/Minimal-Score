@@ -37,9 +37,7 @@ function Snow() {
   return (
     <div className="pointer-events-none fixed inset-0 z-10 overflow-hidden">
       {[...Array(40)].map((_, i) => (
-        <span
-          key={i}
-          className="absolute top-0 w-1 h-1 bg-white rounded-full opacity-70 animate-[snow_8s_linear_infinite]"
+        <span key={i} className="absolute top-0 w-1 h-1 bg-white rounded-full opacity-70 animate-[snow_8s_linear_infinite]"
           style={{
             left: `${Math.random() * 100}%`,
             animationDelay: `${Math.random() * 5}s`,
@@ -53,11 +51,7 @@ function Snow() {
 
 function Firework() {
   return (
-    <motion.div
-      className="fixed inset-0 pointer-events-none z-20"
-      animate={{ opacity: [0, 1, 0] }}
-      transition={{ repeat: Infinity, duration: 2 }}
-    >
+    <motion.div className="fixed inset-0 pointer-events-none z-20" animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 2 }} >
       <div className="absolute top-1/4 left-1/2 text-6xl">🎆</div>
       <div className="absolute top-1/3 left-1/3 text-5xl">✨</div>
       <div className="absolute top-1/4 right-1/3 text-6xl">🎇</div>
@@ -79,8 +73,7 @@ const [theme, setTheme] = useState(getSeasonTheme());
 
     function LoadingScreen({ carRed, carGreen, carBlue }) {
     return (
-      <motion.div
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-950 overflow-hidden"
+      <motion.div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-950 overflow-hidden"
         initial={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.6 }}
@@ -90,23 +83,17 @@ const [theme, setTheme] = useState(getSeasonTheme());
 
         {/* รถวิ่ง */}
         <div className="relative w-full max-w-md h-40">
-          <motion.img
-            src={carRed}
-            className="absolute w-28 mx-10 rotate-90"
+          <motion.img src={carRed} className="absolute w-28 mx-10 rotate-90"
             initial={{ x: -200 }}
             animate={{ x: 420 }}
             transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
           />
-          <motion.img
-            src={carGreen}
-            className="absolute w-28 mx-40 rotate-90 top-10"
+          <motion.img src={carGreen} className="absolute w-28 mx-40 rotate-90 top-10"
             initial={{ x: -260 }}
             animate={{ x: 420 }}
             transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
           />
-          <motion.img
-            src={carBlue}
-            className="absolute w-28 mx-70 rotate-90 top-20"
+          <motion.img src={carBlue} className="absolute w-28 mx-70 rotate-90 top-20"
             initial={{ x: -320 }}
             animate={{ x: 420 }}
             transition={{ repeat: Infinity, duration: 1.6, ease: "linear" }}
@@ -197,7 +184,7 @@ const [theme, setTheme] = useState(getSeasonTheme());
     const now = new Date();
     const minutes = now.getHours() * 60 + now.getMinutes();
 
-    const start = 16 * 60 + 15; // 16:15
+    const start = 9 * 60 + 30; // 16:15
     const end = 16 * 60 + 35;   // 16:35
 
     return minutes >= start && minutes <= end;
@@ -479,7 +466,7 @@ const [theme, setTheme] = useState(getSeasonTheme());
     const s = now.getSeconds();
 
     // ⏱ ก่อนเข้าโบนัส 10 วิ (16:14:50 - 16:14:59)
-    if (h === 16 && m === 14 && s >= 50) {
+    if (h === 9 && m === 10 && s >= 50) {
       setPreBonusCountdown(60 - s); // 10 → 1
     } else {
       setPreBonusCountdown(null);
@@ -920,9 +907,7 @@ function SnowStorm({ bonus }) {
         const size = bonus ? Math.random() * 3 + 1 : Math.random() * 2 + 1;
 
         return (
-          <span
-            key={i}
-            className="absolute top-0 bg-white rounded-full opacity-80"
+          <span key={i} className="absolute top-0 bg-white rounded-full opacity-80"
             style={{
               width: size,
               height: size,
@@ -947,10 +932,7 @@ function SnowPile({ intensity }) {
   return (
     <div className="pointer-events-none fixed bottom-0 left-0 w-full z-30">
       {/* ❄️ Base Snow */}
-      <div
-        className="w-full bg-gradient-to-t
-                   from-white/90 via-white/70 to-transparent
-                   blur-[1px]"
+      <div className="w-full bg-gradient-to-t from-white/90 via-white/70 to-transparent blur-[1px]"
         style={{
           height,
           transition: "height 1s ease-out"
@@ -958,21 +940,15 @@ function SnowPile({ intensity }) {
       />
 
       {/* 🌫️ Soft Edge */}
-      <div
-        className="absolute top-0 left-0 w-full h-6
-                   bg-white/50 blur-lg"
-      />
+      <div className="absolute top-0 left-0 w-full h-6 bg-white/50 blur-lg"/>
     </div>
   );
 }
 
 function SantaLoop() {
   return (
-    <motion.div
-      className="pointer-events-none fixed inset-0 z-10"
-    >
-      <motion.img
-        src={santa}
+    <motion.div className="pointer-events-none fixed inset-0 z-10">
+      <motion.img src={santa}
         alt="Santa"
         className="absolute w-40 md:w-56 drop-shadow-2xl"
         animate={{
@@ -991,51 +967,6 @@ function SantaLoop() {
     </motion.div>
   );
 }
-
-// function GiftDrop() {
-//   const [gifts, setGifts] = React.useState([]);
-
-//   React.useEffect(() => {
-//     const interval = setInterval(() => {
-//       setGifts((g) => [
-//         ...g,
-//         {
-//           id: Date.now(),
-//           x: 15 + Math.random() * 70
-//         }
-//       ]);
-//     }, 2000); // ทุก 2 วิ (ไม่รกเกิน)
-
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   return (
-//     <>
-//       {gifts.map((gift) => (
-//         <motion.div
-//           key={gift.id}
-//           className="fixed text-3xl z-30"
-//           initial={{
-//             x: `${gift.x}%`,
-//             y: 160,
-//             opacity: 1
-//           }}
-//           animate={{
-//             y: "90vh",
-//             opacity: 0
-//           }}
-//           transition={{ duration: 4, ease: "easeIn" }}
-//           onAnimationComplete={() =>
-//             setGifts((g) => g.filter((x) => x.id !== gift.id))
-//           }
-//         >
-//           🎁
-//         </motion.div>
-//       ))}
-//     </>
-//   );
-// }
-
 
 
   return (
@@ -1097,23 +1028,20 @@ function SantaLoop() {
       </motion.div>
     )}
       {explosion && (
-        <motion.div
-          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black"
+        <motion.div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           {/* FLASH */}
-          <motion.div
-            className="absolute inset-0 bg-white"
+          <motion.div className="absolute inset-0 bg-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 0] }}
             transition={{ duration: 0.4 }}
           />
 
           {/* SHAKE */}
-          <motion.div
-            initial={{ scale: 0.6, rotate: 0 }}
+          <motion.div initial={{ scale: 0.6, rotate: 0 }}
             animate={{
               scale: [0.6, 1.2, 1],
               rotate: [0, 3, -3, 2, -2, 0],
@@ -1148,8 +1076,7 @@ function SantaLoop() {
 
       {/* ******************* แจ้งเตือนเวลาโบนัส ******************* */}
       {bonusAlert && (
-        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
-          className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center">
+        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center">
           <div className="block group">
             <div className="relative rounded-xl cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-300 overflow-hidden">              
               <div className="bg-gradient-to-br from-yellow-400 to-orange-500 p-6 rounded-2xl shadow-2xl text-center max-w-sm">
@@ -1172,8 +1099,7 @@ function SantaLoop() {
         <div className="flex-1 w-full max-w-4xl mx-auto p-4">
           {bonusRemain > 0 && (
           <div className="flex justify-center -mt-2 mb-6 z-50">
-            <div className={`px-16 py-2 rounded-b-full font-bold border ${isCritical ? 
-              " bg-red-500/20 border-red-400 text-red-400 animate-pulse" : 
+            <div className={`px-16 py-2 rounded-b-full font-bold border ${isCritical ? " bg-red-500/20 border-red-400 text-red-400 animate-pulse" : 
               "bg-yellow-500/20 border-yellow-400 text-yellow-300 animate-pulse"}`} 
               style={isCritical ? { animation: "shake 0.4s infinite" } : {}}>
               🔥 โบนัสกำลังทำงาน เหลือเวลาอีก {formatTime(bonusRemain)}
@@ -1200,8 +1126,7 @@ function SantaLoop() {
                   {chartData.map((entry, index) => (
                     <Cell key={index} fill={entry.color} />
                   ))}
-                  <LabelList
-                    dataKey="name"
+                  <LabelList dataKey="name"
                     content={({ x, y, width, height, value }) => (
                       <text className="animate-pulse"
                         x={x+3}
@@ -1251,10 +1176,7 @@ function SantaLoop() {
               };
 
               return (
-                <motion.img
-                  key={d.name}
-                  src={carMap[d.name]}
-                  className="absolute w-[200px] h-[130px] mb-5 hover:scale-110 transition-all duration-300"
+                <motion.img key={d.name} src={carMap[d.name]} className="absolute w-[200px] h-[130px] mb-5 hover:scale-110 transition-all duration-300"
                   animate={{
                     left: `${leftPercent + (leftOffsetMap[d.name] ?? 0)}%`,
                     bottom: `${bottomPercent}%`,
@@ -1296,13 +1218,8 @@ function SantaLoop() {
           const winStreak = getCurrentWinStreak(p);
           const loseStreak = getCurrentLoseStreak(p);
           return (
-          <div
-            key={p}
-            onClick={() => setActivePlayer(p)}
-            className="block group text-center cursor-pointer z-20"
-          >
-            <div
-              className={`relative rounded-xl p-3 cursor-pointer overflow-hidden
+          <div key={p} onClick={() => setActivePlayer(p)} className="block group text-center cursor-pointer z-20">
+            <div className={`relative rounded-xl p-3 cursor-pointer overflow-hidden
                 hover:shadow-lg hover:scale-[1.02] transition-all duration-300
                 ${p === 'Meen' ? 'bg-gradient-to-br from-red-800 to-red-500' 
                 : p === 'Cho' ? 'bg-gradient-to-br from-green-800 to-green-500' 
@@ -1314,8 +1231,7 @@ function SantaLoop() {
                 </div>
               )}
               {theme === "newyear" && (
-                <motion.div
-                  className="absolute top-2 left-2 text-[0.6rem] font-bold bg-yellow-500 px-1 py-0.5 rounded-full"
+                <motion.div className="absolute top-2 left-2 text-[0.6rem] font-bold bg-yellow-500 px-1 py-0.5 rounded-full"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ repeat: Infinity, duration: 1 }}
                 >
@@ -1533,16 +1449,10 @@ function SantaLoop() {
                 {/* 🔥 LATEST BADGE */}
                 {isLatest && (
                   <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="absolute top-5 -right-8 py-2
-                              text-2xl font-extrabold
-                              text-yellow-200/30
-                              animate-pulse -z-10"
+                    initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.3 }}
+                    className="absolute top-5 -right-8 py-2 text-2xl font-extrabold text-yellow-200/30 animate-pulse -z-10"
                     style={{rotate: -90}}
-                  >
-                    LATEST
+                  >LATEST
                   </motion.div>
                 )}
                 <div className={`absolute top-0 right-5 w-15 h-15 ${OPlaceColorMap[r.first] ?? "bg-gray-500/10" } rounded-xl -mr-12 -mb-12 group-hover:scale-150 transition-transform duration-500 -z-30`}></div>
@@ -1559,11 +1469,8 @@ function SantaLoop() {
                 </div>
               )}
               {r.kill && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`mt-2 text-xs font-extrabold text-center
-                            ${OPlaceColorMap[r.first]} text-white rounded-full`}
+                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+                  className={`mt-2 text-xs font-extrabold text-center ${OPlaceColorMap[r.first]} text-white rounded-full`}
                 >
                   🌠 {r.kill.killer} ได้สกัดดาวรุ่ง {r.kill.victim}
                 </motion.div>
@@ -1583,8 +1490,7 @@ function SantaLoop() {
       </div>
         
         {activePlayer && (
-          <motion.div
-            className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center"
+          <motion.div className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setActivePlayer(null)}   // 👈 คลิกที่อื่น = ปิด
           >
           <div className="bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 w-[460px] text-center shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
@@ -1599,18 +1505,11 @@ function SantaLoop() {
           {/* ช่องว่างคะแนน */}
           <div className="flex justify-center text-sm font-bold">
             {getGapFromLeader(activePlayer) === 0 ? (
-              <span className="text-green-400">
-                🏆 นำเป็นอันดับ 1
-              </span>
+              <span className="text-green-400">🏆 นำเป็นอันดับ 1</span>
             ) : (
-              <span className="text-red-400">
-                ⏱ ตามอันดับ 1 อยู่ {getGapFromLeader(activePlayer)} แต้ม
+              <span className="text-red-400">⏱ ตามอันดับ 1 อยู่ {getGapFromLeader(activePlayer)} แต้ม
                 {getGapFromLeader(activePlayer) < 2 && (
-                  <motion.span
-                    className="ml-2 text-yellow-300"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ repeat: Infinity, duration: 1 }}
-                  >
+                  <motion.span className="ml-2 text-yellow-300" animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }}>
                     🔥 ใกล้แซง!
                   </motion.span>
                 )}
@@ -1618,9 +1517,7 @@ function SantaLoop() {
             )}
 
             {activePlayer === getLeader() && (
-            <div className="px-2 text-sm text-blue-400 font-semibold">
-              🥈 นำอันดับ 2 อยู่ {getLeadOverSecond(activePlayer)} แต้ม
-            </div>
+            <div className="px-2 text-sm text-blue-400 font-semibold">🥈 นำอันดับ 2 อยู่ {getLeadOverSecond(activePlayer)} แต้ม</div>
           )}
           
           </div>
@@ -1629,12 +1526,7 @@ function SantaLoop() {
           <div className="flex justify-center gap-3 p-2 my-3 border-2 border-blue-900/30 rounded-2xl hover:scale-101 transition-all duration-300">
              {/* 🚗 PLAYER CAR */}
              <div className="-ml-8">
-              <motion.img
-              src={carMap[activePlayer]}
-              alt="car"
-              initial={{ y: 100, opacity: 0, rotate: 90 }}
-              animate={{ y: 30, opacity: 1, rotate: 90 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              <motion.img src={carMap[activePlayer]} alt="car" initial={{ y: 100, opacity: 0, rotate: 90 }} animate={{ y: 30, opacity: 1, rotate: 90 }} transition={{ duration: 0.5, ease: "easeOut" }}
               className="h-28 drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
             />
              </div>
@@ -1653,9 +1545,7 @@ function SantaLoop() {
             <div className="">
               <div className="my-2 p-3 bg-green-500/30 rounded-xl hover:scale-105 transition-all duration-300">
               <div className="text-sm text-green-400">อัตราชนะ</div>
-              <div className="text-3xl font-extrabold text-green-400">
-                {s.winRate}%
-              </div>
+              <div className="text-3xl font-extrabold text-green-400">{s.winRate}%</div>
               </div>
               <div className="my-2 p-2 bg-blue-500/30 rounded-xl hover:scale-105 transition-all duration-300">
                 <div className="text-sm text-blue-400">แนวโน้มล่าสุด</div> 
@@ -1676,46 +1566,28 @@ function SantaLoop() {
               </div>
               <div className="m-2 p-3 text-blue-400 font-semibold bg-blue-500/30 rounded-xl hover:scale-105 transition-all duration-300">
                 <p className="text-[0.75rem]">สกัดดาวรุ่งพุ่งแรง</p>
-                <p className="mt-2 text-3xl">
-                  🌠 {killStats[activePlayer] || 0}
-                </p>
+                <p className="mt-2 text-3xl">🌠 {killStats[activePlayer] || 0}</p>
               </div>
             </div>
           </div>
           <div className="mt-3 p-3 bg-blue-500/20 rounded-xl">
-              <div className="text-sm font-bold text-blue-400 mb-2">
-                🌠 จารึกสกัดดาวรุ่ง
-              </div>
+              <div className="text-sm font-bold text-blue-400 mb-2">🌠 จารึกสกัดดาวรุ่ง</div>
 
               {Object.entries(killMatrix[activePlayer] || {}).map(
-                ([victim, count]) =>
-                  count > 0 && (
-                    <div key={victim} className="text-sm text-blue-400">
-                      ⚔️ สกัดดาวรุ่งอา {victim} จำนวน {count} ครั้ง
-                    </div>
-                  )
+                ([victim, count]) => count > 0 && ( <div key={victim} className="text-sm text-blue-400">⚔️ สกัดดาวรุ่งอา {victim} จำนวน {count} ครั้ง</div> )
               )}
             </div>
 
             {/* Progress เทียบผู้นำ */}
             <div className="mt-4">
               <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-green-400 to-emerald-500"
-                  initial={{ width: 0 }}
-                  animate={{
-                    width: `${
-                      (scores[activePlayer] / Math.max(scores[getLeader()], 1)) * 100
-                    }%`,
-                  }}
-                  transition={{ duration: 0.6 }}
+                <motion.div className="h-full bg-gradient-to-r from-green-400 to-emerald-500" initial={{ width: 0 }} animate={{
+                    width: `${(scores[activePlayer] / Math.max(scores[getLeader()], 1)) * 100}%`,}} transition={{ duration: 0.6 }}
                 />
               </div>
               <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>💎คะแนน</span>
-                <span>
-                  {scores[activePlayer]} / {scores[getLeader()]} 🥤
-                </span>
+                <span>{scores[activePlayer]} / {scores[getLeader()]} 🥤</span>
               </div>
             </div>
 
